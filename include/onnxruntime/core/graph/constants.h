@@ -24,6 +24,7 @@ constexpr const char* kMSDmlDomain = "com.microsoft.dml";
 constexpr const char* kNGraphDomain = "com.intel.ai";
 constexpr const char* kMIGraphXDomain = "";
 constexpr const char* kVitisAIDomain = "com.xilinx";
+constexpr const char* kMetaWareNNDomain = "com.synopsys";
 constexpr const char* kCpuExecutionProvider = "CPUExecutionProvider";
 constexpr const char* kCudaExecutionProvider = "CUDAExecutionProvider";
 constexpr const char* kDnnlExecutionProvider = "DnnlExecutionProvider";
@@ -38,6 +39,7 @@ constexpr const char* kDmlExecutionProvider = "DmlExecutionProvider";
 constexpr const char* kMIGraphXExecutionProvider = "MIGraphXExecutionProvider";
 constexpr const char* kAclExecutionProvider = "ACLExecutionProvider";
 constexpr const char* kArmNNExecutionProvider = "ArmNNExecutionProvider";
+constexpr const char* kMetaWareNNExecutionProvider = "MetaWareNNExecutionProvider";
 constexpr const char *providers_available[] = {
   kCpuExecutionProvider,
 #ifdef USE_CUDA
@@ -79,5 +81,9 @@ constexpr const char *providers_available[] = {
 #ifdef USE_ARMNN
   kArmNNExecutionProvider,
 #endif
+#ifdef USE_METAWARENN
+  kMetaWareNNExecutionProvider,
+#endif
+
 };
 }  // namespace onnxruntime

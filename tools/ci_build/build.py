@@ -358,6 +358,8 @@ def parse_arguments():
     parser.add_argument(
         "--build_micro_benchmarks", action='store_true',
         help="Build ONNXRuntime micro-benchmarks.")
+    parser.add_argument(
+        "--use_metawarenn", action='store_true', help="Build with MetaWareNN")
     return parser.parse_args()
 
 
@@ -664,7 +666,8 @@ def generate_build_tree(cmake_path, source_dir, build_dir, cuda_home, cudnn_home
         "-Donnxruntime_USE_HOROVOD=" + (
             "ON" if args.use_horovod else "OFF"),
         "-Donnxruntime_BUILD_BENCHMARKS=" + (
-            "ON" if args.build_micro_benchmarks else "OFF")
+            "ON" if args.build_micro_benchmarks else "OFF"),
+        "-Donnxruntime_USE_METAWARENN=" + ("ON" if args.use_metawarenn else "OFF")
     ]
 
     if mpi_home and os.path.exists(mpi_home):

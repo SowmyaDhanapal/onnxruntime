@@ -91,6 +91,10 @@ if(onnxruntime_USE_ARMNN)
   set(PROVIDERS_ARMNN onnxruntime_providers_armnn)
   list(APPEND ONNXRUNTIME_PROVIDER_NAMES armnn)
 endif()
+if(onnxruntime_USE_METAWARENN)
+  set(PROVIDERS_METAWARENN onnxruntime_providers_metawarenn)
+  list(APPEND ONNXRUNTIME_PROVIDER_NAMES metawarenn)
+endif()
 source_group(TREE ${ONNXRUNTIME_ROOT}/core FILES ${onnxruntime_providers_common_srcs} ${onnxruntime_providers_srcs})
 
 set(onnxruntime_providers_src ${onnxruntime_providers_common_srcs} ${onnxruntime_providers_srcs})
@@ -690,4 +694,20 @@ if (onnxruntime_USE_ARMNN)
   target_include_directories(onnxruntime_providers_armnn PRIVATE ${ONNXRUNTIME_ROOT} ${eigen_INCLUDE_DIRS} ${ARMNN_INCLUDE_DIR})
   install(DIRECTORY ${PROJECT_SOURCE_DIR}/../include/onnxruntime/core/providers/armnn  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/onnxruntime/core/providers)
   set_target_properties(onnxruntime_providers_armnn PROPERTIES LINKER_LANGUAGE CXX)
+endif()
+
+if (onnxruntime_USE_METAWARENN)
+  file(GLOB_RECURSE onnxruntime_providers_metawarenn_cc_srcs
+    "${ONNXRUNTIME_ROOT}/core/providers/metawarenn/*.h"
+    "${ONNXRUNTIME_ROOT}/core/providers/metawarenn/*.cc"
+  )
+
+  source_group(TREE ${ONNXRUNTIME_ROOT}/core FILES ${onnxruntime_providers_metawarenn_cc_srcs})
+  add_library(onnxruntime_providers_metawarenn ${onnxruntime_providers_metawarenn_cc_srcs})
+  onnxruntime_add_include_to_target(onnxruntime_providers_metawarenn onnxruntime_common onnxruntime_framework onnx onnx_proto protobuf::libprotobuf)
+  add_dependencies(onnxruntime_providers_metawarenn ${onnxruntime_EXTERNAL_DEPENDENCIES})
+  set_target_properties(onnxruntime_providers_metawarenn PROPERTIES FOLDER "ONNXRuntime")
+  target_include_directories(onnxruntime_providers_metawarenn PRIVATE ${ONNXRUNTIME_ROOT} ${METAWARENN_INCLUDE_DIR})
+  install(DIRECTORY ${PROJECT_SOURCE_DIR}/../include/onnxruntime/core/providers/metawarenn  DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/onnxruntime/core/providers)
+  set_target_properties(onnxruntime_providers_metawarenn PROPERTIES LINKER_LANGUAGE CXX)
 endif()
