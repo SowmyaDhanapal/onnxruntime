@@ -1,11 +1,42 @@
 #include "metawarenn_execution_provider.h"
 #include "core/session/inference_session.h"
 #include "core/framework/compute_capability.h"
+#include "core/session/onnxruntime_cxx_api.h"
+#include "core/framework/allocatormgr.h"
+#include "core/framework/memcpy.h"
+#include "builders/model_builder.h"
+
+namespace {
+struct KernelRegistryAndStatus {
+  std::shared_ptr<onnxruntime::KernelRegistry> kernel_registry = std::make_shared<onnxruntime::KernelRegistry>();
+  Status st;
+};
+}  // namespace
 
 namespace onnxruntime {
 
+constexpr const char* MetaWareNN = "MetaWareNN";
+
 MetaWareNNExecutionProvider::MetaWareNNExecutionProvider()
     : IExecutionProvider{onnxruntime::kMetaWareNNExecutionProvider} {
+  DeviceAllocatorRegistrationInfo device_info(
+      {OrtMemTypeDefault,
+       [](int) {
+         return onnxruntime::make_unique<CPUAllocator>(OrtMemoryInfo(MetaWareNN, OrtAllocatorType::OrtDeviceAllocator));
+       },
+       std::numeric_limits<size_t>::max()});
+
+  InsertAllocator(CreateAllocator(device_info));
+
+  DeviceAllocatorRegistrationInfo cpu_info{
+      OrtMemTypeCPUOutput,
+      [](int) {
+        return onnxruntime::make_unique<CPUAllocator>(
+            OrtMemoryInfo(MetaWareNN, OrtAllocatorType::OrtDeviceAllocator, OrtDevice(), 0, OrtMemTypeCPUOutput));
+      },
+      std::numeric_limits<size_t>::max()};
+
+  InsertAllocator(CreateAllocator(cpu_info));
 }
 MetaWareNNExecutionProvider::~MetaWareNNExecutionProvider() {}
 
@@ -156,8 +187,8 @@ MetaWareNNExecutionProvider::GetCapability(const onnxruntime::GraphViewer& graph
     return result;
   }
 
-  //static std::set<std::string> metawarenn_supported_ops = {"Add", "Conv", "GlobalAveragePool", "Relu", "Reshape"};
-  static std::set<std::string> metawarenn_supported_ops = {"Add", "Conv", "Relu", "Reshape"};
+  static std::set<std::string> metawarenn_supported_ops = {"Add", "Conv", "GlobalAveragePool", "Relu", "Reshape"};
+  //static std::set<std::string> metawarenn_supported_ops = {"Add", "Conv", "Relu", "Reshape"};
   std::vector<NodeIndex> unsupported_nodes_idxes;
 
   // This is a list of initializers that MetaWareNNGraph considers as constants. 
@@ -220,16 +251,104 @@ common::Status MetaWareNNExecutionProvider::Compile(const std::vector<onnxruntim
   std::cout << "\n MetaWareNNExecutionProvider::Compile() \n";
   for (const auto* fused_node : fused_nodes) {
     std::cout << "\n  Fused_node_name: " << fused_node->Name() << "\n";
-    std::shared_ptr<metawarenn::BackendManager> backend_manager = std::make_shared<metawarenn::BackendManager>(fused_node, *GetLogger());
-  }
-  NodeComputeInfo compute_info;
-  node_compute_funcs.push_back(compute_info);
+    //std::shared_ptr<metawarenn::BackendManager> backend_manager = std::make_shared<metawarenn::BackendManager>(fused_node, *GetLogger());
+    // Reconstruct graph proto from fused node's function body
+    const auto* func_body = fused_node->GetFunctionBody();
+    if (!func_body) {
+      return common::Status(common::ONNXRUNTIME, common::INVALID_ARGUMENT, "Function body is empty");
+    }
 
-  //Define these funtions based on MetaWareNN FunctionState
-  compute_info.create_state_func = nullptr;//[](){};
-  compute_info.compute_func = nullptr;//[](){};
-  compute_info.release_state_func = nullptr;//[](){};
+    const Graph& graph_body = func_body->Body();
+    {
+      onnxruntime::GraphViewer graph_viewer(graph_body);
+      metawarenn::ModelBuilder builder(graph_viewer);
+      std::unique_ptr<metawarenn::Model> metawarenn_model;
+      ORT_RETURN_IF_ERROR(builder.Compile(metawarenn_model));
+      /* Input and output defs mapping */
+      metawarenn_models_.emplace(fused_node->Name(), std::move(metawarenn_model));
+    }
+
+    NodeComputeInfo compute_info;
+
+    //Define these funtions based on MetaWareNN FunctionState
+    compute_info.create_state_func = [&](ComputeContext* context, FunctionState* state) {
+      std::cout<<"Create_state_func!!!"<<"-> Fused node name: "<< context->node_name<<std::endl;
+      *state = metawarenn_models_[context->node_name].get();
+      return 0;
+    };
+
+    compute_info.release_state_func = [](FunctionState state) {
+      ORT_UNUSED_PARAMETER(state);
+    };
+
+    compute_info.compute_func = [](FunctionState state, const OrtCustomOpApi* api, OrtKernelContext* context) {
+      Ort::CustomOpApi ort{*api};
+      std::cout<<"\nCompute_func!!!"<<std::endl;
+      metawarenn::Model* model = reinterpret_cast<metawarenn::Model*>(state);
+      const size_t num_inputs = ort.KernelContext_GetInputCount(context);
+      const size_t num_outputs = ort.KernelContext_GetOutputCount(context);
+      std::cout<<"\nInputs - "<<num_inputs<<" Outputs "<<num_outputs<<std::endl;
+      const auto& model_inputs = model->GetInputs();
+      if(model_inputs.empty()){
+        std::cout<<"No inputs";
+      }
+      return Status::OK();
+    };
+
+    node_compute_funcs.push_back(compute_info);
+    }
   
   return Status::OK();
 }
+
+ONNX_OPERATOR_KERNEL_EX(
+    MemcpyFromHost,
+    kOnnxDomain,
+    1,
+    kMetaWareNNExecutionProvider,
+    KernelDefBuilder()
+        .InputMemoryType<OrtMemTypeCPUInput>(0)
+        .TypeConstraint("T", DataTypeImpl::AllFixedSizeTensorTypes()),
+    Memcpy);
+
+ONNX_OPERATOR_KERNEL_EX(
+    MemcpyToHost,
+    kOnnxDomain,
+    1,
+    kMetaWareNNExecutionProvider,
+    KernelDefBuilder()
+        .OutputMemoryType<OrtMemTypeCPUOutput>(0)
+        .TypeConstraint("T", DataTypeImpl::AllFixedSizeTensorTypes()),
+    Memcpy);
+
+class ONNX_OPERATOR_KERNEL_CLASS_NAME(
+    kMetaWareNNExecutionProvider, kOnnxDomain, 1, MemcpyFromHost);
+class ONNX_OPERATOR_KERNEL_CLASS_NAME(
+    kMetaWareNNExecutionProvider, kOnnxDomain, 1, MemcpyToHost);
+
+static Status RegisterMetaWareNNKernels(KernelRegistry& kernel_registry) {
+  static const BuildKernelCreateInfoFn function_table[] = {
+      BuildKernelCreateInfo<ONNX_OPERATOR_KERNEL_CLASS_NAME(kMetaWareNNExecutionProvider, kOnnxDomain, 1, MemcpyFromHost)>,
+      BuildKernelCreateInfo<ONNX_OPERATOR_KERNEL_CLASS_NAME(kMetaWareNNExecutionProvider, kOnnxDomain, 1, MemcpyToHost)>,
+  };
+
+  for (auto& function_table_entry : function_table) {
+    ORT_RETURN_IF_ERROR(kernel_registry.Register(function_table_entry()));
+  }
+  return Status::OK();
+}
+
+KernelRegistryAndStatus GetMetaWareNNKernelRegistry() {
+  KernelRegistryAndStatus ret;
+  ret.st = RegisterMetaWareNNKernels(*ret.kernel_registry);
+  return ret;
+}
+
+std::shared_ptr<KernelRegistry>
+MetaWareNNExecutionProvider::GetKernelRegistry() const {
+  static KernelRegistryAndStatus k = onnxruntime::GetMetaWareNNKernelRegistry();
+  ORT_THROW_IF_ERROR(k.st);
+  return k.kernel_registry;
+}
+
 }  // namespace onnxruntime

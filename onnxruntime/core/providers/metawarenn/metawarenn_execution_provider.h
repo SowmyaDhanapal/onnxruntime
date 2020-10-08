@@ -1,4 +1,5 @@
 #include "core/framework/execution_provider.h"
+#include "core/providers/metawarenn/model.h"
 #include "core/graph/onnx_protobuf.h"
 #include "backend_manager.h"
 
@@ -14,6 +15,9 @@ public:
                 const std::vector<const KernelRegistry*>& /*kernel_registries*/) const override;
   common::Status Compile(const std::vector<onnxruntime::Node*>& fused_nodes,
                          std::vector<NodeComputeInfo>& node_compute_funcs) override;
+  std::shared_ptr<KernelRegistry> GetKernelRegistry() const override;
+ private:
+  std::unordered_map<std::string, std::unique_ptr<onnxruntime::metawarenn::Model>> metawarenn_models_;
 };
 
 }  // namespace onnxruntime
