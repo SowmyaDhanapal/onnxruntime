@@ -7,7 +7,7 @@ namespace graph {
 
 namespace onnx {
 
-  std::shared_ptr<graph::Function> import_onnx_model(/*std::istream& stream*/);
+  std::shared_ptr<graph::Function> import_onnx_model(std::istream& stream);
 
 } //namespace onnx
 

@@ -13,7 +13,7 @@ CreateCNNNetwork(const ONNX_NAMESPACE::ModelProto& model_proto) {
   std::shared_ptr<graph::Function> graph_func;
 
   try {
-    graph_func = graph::onnx::import_onnx_model(/*model_stream*/);
+    graph_func = graph::onnx::import_onnx_model(model_stream);
     //LOGS_DEFAULT(INFO) << "ONNX Import Done";
   } catch (const std::exception& exp) {
     //ORT_THROW(log_tag + "[MetaWareNN-EP] Exception while importing model to nGraph Func: " + std::string(exp.what()));
