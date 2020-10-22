@@ -5,6 +5,13 @@
 
 namespace onnxruntime {
 
+struct MetaWareNNFunctionState {
+  AllocateFunc allocate_func = nullptr;
+  DestroyFunc destroy_func = nullptr;
+  AllocatorHandle allocator_handle = nullptr;
+  std::shared_ptr<metawarenn::BackendManager> backend_manager;
+};
+
 class MetaWareNNExecutionProvider : public IExecutionProvider {
 public:
   MetaWareNNExecutionProvider();

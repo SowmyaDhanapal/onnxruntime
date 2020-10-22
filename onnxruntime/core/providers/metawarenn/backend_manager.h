@@ -8,6 +8,7 @@ namespace metawarenn {
 class BackendManager {
  public:
   BackendManager(const onnxruntime::Node* fused_node, const logging::Logger& logger);
+  void Compute(Ort::CustomOpApi api, OrtKernelContext* context);
 
  private:
   ONNX_NAMESPACE::ModelProto GetModelProtoFromFusedNode(

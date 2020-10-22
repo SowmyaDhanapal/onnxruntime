@@ -251,9 +251,9 @@ common::Status MetaWareNNExecutionProvider::Compile(const std::vector<onnxruntim
   std::cout << "\n MetaWareNNExecutionProvider::Compile() \n";
   for (const auto* fused_node : fused_nodes) {
     std::cout << "\n  Fused_node_name: " << fused_node->Name() << "\n";
-    //std::shared_ptr<metawarenn::BackendManager> backend_manager = std::make_shared<metawarenn::BackendManager>(fused_node, *GetLogger());
+    std::shared_ptr<metawarenn::BackendManager> backend_manager = std::make_shared<metawarenn::BackendManager>(fused_node, *GetLogger());
     // Reconstruct graph proto from fused node's function body
-    const auto* func_body = fused_node->GetFunctionBody();
+    /*const auto* func_body = fused_node->GetFunctionBody();
     if (!func_body) {
       return common::Status(common::ONNXRUNTIME, common::INVALID_ARGUMENT, "Function body is empty");
     }
@@ -263,9 +263,9 @@ common::Status MetaWareNNExecutionProvider::Compile(const std::vector<onnxruntim
       onnxruntime::GraphViewer graph_viewer(graph_body);
       metawarenn::ModelBuilder builder(graph_viewer);
       std::unique_ptr<metawarenn::Model> metawarenn_model;
-      ORT_RETURN_IF_ERROR(builder.Compile(metawarenn_model));
+      ORT_RETURN_IF_ERROR(builder.Compile(metawarenn_model));*/
       /* Input and output defs mapping */
-      metawarenn_models_.emplace(fused_node->Name(), std::move(metawarenn_model));
+      /*metawarenn_models_.emplace(fused_node->Name(), std::move(metawarenn_model));
     }
 
     NodeComputeInfo compute_info;
@@ -293,7 +293,37 @@ common::Status MetaWareNNExecutionProvider::Compile(const std::vector<onnxruntim
         std::cout<<"No inputs";
       }
       return Status::OK();
+    };*/
+
+    NodeComputeInfo compute_info;
+    //Define these funtions based on MetaWareEV FunctionState
+    compute_info.create_state_func =
+        [backend_manager](ComputeContext* context, FunctionState* state) {
+          MetaWareNNFunctionState* p = new MetaWareNNFunctionState();
+          p->allocate_func = context->allocate_func;
+          p->destroy_func = context->release_func;
+          p->allocator_handle = context->allocator_handle;
+          p->backend_manager = backend_manager;
+          *state = static_cast<FunctionState>(p);
+          return 0;
+        };
+    compute_info.compute_func = [](FunctionState state, const OrtApi* api, OrtKernelContext* context) {
+      auto function_state = static_cast<MetaWareNNFunctionState*>(state);
+      try {
+        function_state->backend_manager->Compute(*api, context);
+      } catch (const char* msg) {
+        return common::Status(common::ONNXRUNTIME, common::FAIL, msg);
+      }
+      return Status::OK();
     };
+
+    compute_info.release_state_func =
+        [](FunctionState state) {
+          if (state) {
+            MetaWareNNFunctionState* function_state = static_cast<MetaWareNNFunctionState*>(state);
+            delete function_state;
+          }
+        };
 
     node_compute_funcs.push_back(compute_info);
     }
