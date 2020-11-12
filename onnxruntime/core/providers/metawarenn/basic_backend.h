@@ -2,7 +2,7 @@
 #include "core/session/onnxruntime_cxx_api.h"
 
 namespace onnxruntime {
-namespace metawarenn {
+namespace metawarenn_ep {
 
 class BasicBackend {
   public:
@@ -16,5 +16,5 @@ class BasicBackend {
     mutable std::mutex compute_lock_;
  //Private functions to handle the inference like start, end functions.
 };
-}  // namespace metawarenn
+}  // namespace metawarenn_ep
 }  // namespace onnxruntime

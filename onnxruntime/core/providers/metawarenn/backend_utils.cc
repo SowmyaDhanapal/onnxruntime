@@ -2,7 +2,8 @@
 #include "backend_utils.h"
 
 namespace onnxruntime {
-namespace metawarenn {
+
+namespace metawarenn_ep {
 
 std::shared_ptr<InferenceEngine::CNNNetwork>
 CreateCNNNetwork(const ONNX_NAMESPACE::ModelProto& model_proto) {
@@ -10,10 +11,10 @@ CreateCNNNetwork(const ONNX_NAMESPACE::ModelProto& model_proto) {
   std::cout << "\n In CreateCNNNetwork!!";
 
   std::istringstream model_stream{model_proto.SerializeAsString()};
-  std::shared_ptr<graph::Function> graph_func;
+  std::shared_ptr<metawarenn::Function> graph_func;
 
   try {
-    graph_func = graph::onnx::import_onnx_model(model_stream);
+    graph_func = metawarenn::import_onnx_model(model_stream);
     //LOGS_DEFAULT(INFO) << "ONNX Import Done";
   } catch (const std::exception& exp) {
     //ORT_THROW(log_tag + "[MetaWareNN-EP] Exception while importing model to nGraph Func: " + std::string(exp.what()));
@@ -43,5 +44,5 @@ void SetIODefs(/*const ONNX_NAMESPACE::ModelProto& model_proto,
   //ConvertPrecisionONNXToOpenVINO() and 
   //Set_the_EV_precision() to the network for its ip & op
 }
-}  // namespace metawarenn
+}  // namespace metawarenn_ep
 }  // namespace onnxruntime

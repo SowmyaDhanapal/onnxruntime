@@ -2,7 +2,7 @@
 #include "core/graph/model.h"
 
 namespace onnxruntime {
-namespace metawarenn {
+namespace metawarenn_ep {
 
 BackendManager::BackendManager(const onnxruntime::Node* fused_node, const logging::Logger& logger) {
   std::cout << "\n  --> In MetaWareNN BackendManager()  \n";
@@ -35,5 +35,5 @@ void BackendManager::Compute(Ort::CustomOpApi api, OrtKernelContext* context) {
   metawarenn_backend_->Infer(api, context);
 }
 
-}  // namespace metawarenn
+}  // namespace metawarenn_ep
 }  // namespace onnxruntime

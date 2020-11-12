@@ -4,7 +4,7 @@
 #include "core/framework/op_kernel_context_internal.h"
 
 namespace onnxruntime {
-namespace metawarenn {
+namespace metawarenn_ep {
 
 BasicBackend::BasicBackend(const ONNX_NAMESPACE::ModelProto& model_proto) {
   std::cout << "\n   ---> In Basic Backend Empty Constructor\n" << model_proto.producer_name();
@@ -38,5 +38,5 @@ void BasicBackend::Infer(Ort::CustomOpApi& ort, OrtKernelContext* context) {
   //CompleteAsyncInference(ort, output_tensors, infer_request_, ie_cnn_network_);
 }
 
-}  // namespace metawarenn
+}  // namespace metawarenn_ep
 }  // namespace onnxruntime

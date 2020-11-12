@@ -1,8 +1,8 @@
-namespace graph {
+namespace metawarenn {
 
 class Function {
   Function();
   ~Function();
 };
 
-}  // namespace graph
+}  // namespace metawarenn

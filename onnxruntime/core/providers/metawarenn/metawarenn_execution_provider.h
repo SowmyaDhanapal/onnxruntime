@@ -1,5 +1,4 @@
 #include "core/framework/execution_provider.h"
-#include "core/providers/metawarenn/model.h"
 #include "core/graph/onnx_protobuf.h"
 #include "backend_manager.h"
 
@@ -9,7 +8,7 @@ struct MetaWareNNFunctionState {
   AllocateFunc allocate_func = nullptr;
   DestroyFunc destroy_func = nullptr;
   AllocatorHandle allocator_handle = nullptr;
-  std::shared_ptr<metawarenn::BackendManager> backend_manager;
+  std::shared_ptr<metawarenn_ep::BackendManager> backend_manager;
 };
 
 class MetaWareNNExecutionProvider : public IExecutionProvider {
@@ -23,8 +22,6 @@ public:
   common::Status Compile(const std::vector<onnxruntime::Node*>& fused_nodes,
                          std::vector<NodeComputeInfo>& node_compute_funcs) override;
   std::shared_ptr<KernelRegistry> GetKernelRegistry() const override;
- private:
-  std::unordered_map<std::string, std::unique_ptr<onnxruntime::metawarenn::Model>> metawarenn_models_;
 };
 
 }  // namespace onnxruntime

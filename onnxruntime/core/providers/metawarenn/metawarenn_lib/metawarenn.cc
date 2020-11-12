@@ -7,11 +7,9 @@
 
 using namespace ONNX_NAMESPACE;
 
-namespace graph {
+namespace metawarenn {
 
-namespace onnx {
-
-  std::shared_ptr<graph::Function> import_onnx_model(std::istream& stream) {
+  std::shared_ptr<Function> import_onnx_model(std::istream& stream) {
     std::cout << "\n import_onnx_model";
     ModelProto model_proto;
 
@@ -46,9 +44,8 @@ namespace onnx {
 
     return nullptr;
   }
-} //namespace onnx
 
-} //namespace graph
+} //namespace metawarenn
 
 namespace InferenceEngine {
 

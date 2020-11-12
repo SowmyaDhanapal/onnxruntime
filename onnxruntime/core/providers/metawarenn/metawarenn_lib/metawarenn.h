@@ -3,15 +3,11 @@
 
 #include "function.h"
 
-namespace graph {
+namespace metawarenn {
 
-namespace onnx {
+  std::shared_ptr<Function> import_onnx_model(std::istream& stream);
 
-  std::shared_ptr<graph::Function> import_onnx_model(std::istream& stream);
-
-} //namespace onnx
-
-} //namespace graph
+} //namespace metawarenn
 
 namespace InferenceEngine {
 

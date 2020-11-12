@@ -3,7 +3,7 @@
 #include "basic_backend.h"
 
 namespace onnxruntime {
-namespace metawarenn {
+namespace metawarenn_ep {
 
 class BackendManager {
  public:
@@ -17,5 +17,5 @@ class BackendManager {
   std::shared_ptr<BasicBackend> metawarenn_backend_;
 };
 
-}  // namespace metawarenn
+}  // namespace metawarenn_ep
 }  // namespace onnxruntime

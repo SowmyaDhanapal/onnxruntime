@@ -4,7 +4,6 @@
 #include "core/session/onnxruntime_cxx_api.h"
 #include "core/framework/allocatormgr.h"
 #include "core/framework/memcpy.h"
-#include "builders/model_builder.h"
 
 namespace {
 struct KernelRegistryAndStatus {
@@ -251,50 +250,7 @@ common::Status MetaWareNNExecutionProvider::Compile(const std::vector<onnxruntim
   std::cout << "\n MetaWareNNExecutionProvider::Compile() \n";
   for (const auto* fused_node : fused_nodes) {
     std::cout << "\n  Fused_node_name: " << fused_node->Name() << "\n";
-    std::shared_ptr<metawarenn::BackendManager> backend_manager = std::make_shared<metawarenn::BackendManager>(fused_node, *GetLogger());
-    // Reconstruct graph proto from fused node's function body
-    /*const auto* func_body = fused_node->GetFunctionBody();
-    if (!func_body) {
-      return common::Status(common::ONNXRUNTIME, common::INVALID_ARGUMENT, "Function body is empty");
-    }
-
-    const Graph& graph_body = func_body->Body();
-    {
-      onnxruntime::GraphViewer graph_viewer(graph_body);
-      metawarenn::ModelBuilder builder(graph_viewer);
-      std::unique_ptr<metawarenn::Model> metawarenn_model;
-      ORT_RETURN_IF_ERROR(builder.Compile(metawarenn_model));*/
-      /* Input and output defs mapping */
-      /*metawarenn_models_.emplace(fused_node->Name(), std::move(metawarenn_model));
-    }
-
-    NodeComputeInfo compute_info;
-
-    //Define these funtions based on MetaWareNN FunctionState
-    compute_info.create_state_func = [&](ComputeContext* context, FunctionState* state) {
-      std::cout<<"Create_state_func!!!"<<"-> Fused node name: "<< context->node_name<<std::endl;
-      *state = metawarenn_models_[context->node_name].get();
-      return 0;
-    };
-
-    compute_info.release_state_func = [](FunctionState state) {
-      ORT_UNUSED_PARAMETER(state);
-    };
-
-    compute_info.compute_func = [](FunctionState state, const OrtCustomOpApi* api, OrtKernelContext* context) {
-      Ort::CustomOpApi ort{*api};
-      std::cout<<"\nCompute_func!!!"<<std::endl;
-      metawarenn::Model* model = reinterpret_cast<metawarenn::Model*>(state);
-      const size_t num_inputs = ort.KernelContext_GetInputCount(context);
-      const size_t num_outputs = ort.KernelContext_GetOutputCount(context);
-      std::cout<<"\nInputs - "<<num_inputs<<" Outputs "<<num_outputs<<std::endl;
-      const auto& model_inputs = model->GetInputs();
-      if(model_inputs.empty()){
-        std::cout<<"No inputs";
-      }
-      return Status::OK();
-    };*/
-
+    std::shared_ptr<metawarenn_ep::BackendManager> backend_manager = std::make_shared<metawarenn_ep::BackendManager>(fused_node, *GetLogger());
     NodeComputeInfo compute_info;
     //Define these funtions based on MetaWareEV FunctionState
     compute_info.create_state_func =
