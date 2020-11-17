@@ -1,7 +1,11 @@
+#ifndef METAWARENN_H_
+#define METAWARENN_H_
+
 #include <memory>
 #include <iostream>
 
 #include "function.h"
+#include "metawarenn_graph.h"
 
 namespace metawarenn {
 
@@ -40,3 +44,5 @@ public:
   InferRequest CreateInferRequestPtr();
 };
 } //namespace InferenceEngine
+
+#endif //METAWARENN_H_
