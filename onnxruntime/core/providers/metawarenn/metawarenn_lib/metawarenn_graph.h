@@ -3,6 +3,7 @@
 
 #include "metawarenn_model.h"
 #include "metawarenn_node.h"
+#include "metawarenn_value_info.h"
 
 namespace metawarenn {
 
@@ -14,6 +15,8 @@ class MWNNGraph {
     GraphProto graph_proto;
     MWNNModel mwnn_model;
     std::vector<MWNNNode> mwnn_nodes;
+    std::vector<MWNNValueInfo> mwnn_inputs;
+    std::vector<MWNNValueInfo> mwnn_outputs;
 };
 
 } //namespace metawarenn

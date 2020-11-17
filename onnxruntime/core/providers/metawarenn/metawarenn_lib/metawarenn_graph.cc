@@ -11,6 +11,14 @@ MWNNGraph::MWNNGraph(GraphProto& onnx_graph_proto, MWNNModel& model) {
       MWNNNode mwnn_node(node_proto);
       mwnn_nodes.emplace_back(mwnn_node);
     }
+    for (auto ip_value_info_proto : graph_proto.input()) {
+      MWNNValueInfo mwnn_input(ip_value_info_proto);
+      mwnn_inputs.emplace_back(mwnn_input);
+    }
+    for (auto op_value_info_proto : graph_proto.output()) {
+      MWNNValueInfo mwnn_output(op_value_info_proto);
+      mwnn_outputs.emplace_back(mwnn_output);
+    }
 }
 MWNNGraph::~MWNNGraph() {
     //std::cout << "\n In MetawareNN Graph Destructor";
