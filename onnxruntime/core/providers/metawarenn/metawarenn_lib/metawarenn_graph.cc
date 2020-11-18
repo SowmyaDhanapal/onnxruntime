@@ -7,6 +7,11 @@ MWNNGraph::MWNNGraph(GraphProto& onnx_graph_proto, MWNNModel& model) {
     mwnn_model = model;
     std::cout << "\n In MetawareNN Graph Constructor";
 
+    for (auto tensor_proto : graph_proto.initializer()) {
+        MWNNTensor mwnn_tensor(tensor_proto);
+        mwnn_initializer_tensors.emplace_back(mwnn_tensor);
+    }
+
     for (auto node_proto : graph_proto.node()) {
       MWNNNode mwnn_node(node_proto);
       mwnn_nodes.emplace_back(mwnn_node);
