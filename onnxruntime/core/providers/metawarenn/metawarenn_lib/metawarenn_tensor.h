@@ -9,16 +9,17 @@ namespace metawarenn {
  template <typename T, typename Container>
 inline std::vector<T> get_data(const Container& container)
 {
-    return std::vector<T>(std::begin(container), std::end(container));
+  return std::vector<T>(std::begin(container), std::end(container));
 }
 
 class MWNNTensor {
   public:
-    MWNNTensor() = default;
     MWNNTensor(TensorProto& onnx_tensor_proto);
-    ~MWNNTensor();
     void set_tensor();
-    std::vector<float> get_tensor();
+    std::string get_name() { return name; }
+    int get_type() { return onnx_type; }
+    std::vector<int64_t> get_dims() { return dims; }
+    std::vector<float> get_tensor() { return tensor; }
   private:
     TensorProto tensor_proto;
     std::string name;

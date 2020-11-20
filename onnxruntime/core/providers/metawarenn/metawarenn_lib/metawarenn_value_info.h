@@ -8,16 +8,16 @@ namespace metawarenn {
 
 class MWNNValueInfo {
   public:
-    MWNNValueInfo() = default;
     MWNNValueInfo(ValueInfoProto& onnx_value_info_proto);
-    ~MWNNValueInfo();
+    std::string get_name() { return name; }
+    int get_type() { return onnx_type; }
+    std::vector<int64_t> get_dims() { return dims; }
   private:
     ValueInfoProto value_info_proto;
     std::string name;
     int onnx_type;
     ElementType::element_type t_type;
     std::vector<int64_t> dims;
-
 };
 
 } //namespace metawarenn

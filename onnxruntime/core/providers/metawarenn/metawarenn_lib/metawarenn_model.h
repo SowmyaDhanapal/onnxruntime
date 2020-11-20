@@ -15,7 +15,6 @@ class MWNNModel {
   public:
     MWNNModel() = default;
     MWNNModel(ModelProto& onnx_model_proto);
-    ~MWNNModel();
   private:
     ModelProto model_proto;
 };

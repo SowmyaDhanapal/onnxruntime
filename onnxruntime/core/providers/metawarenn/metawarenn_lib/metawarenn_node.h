@@ -8,9 +8,12 @@ namespace metawarenn {
 
 class MWNNNode {
   public:
-    MWNNNode() = default;
     MWNNNode(NodeProto& onnx_node_proto);
-    ~MWNNNode();
+    std::string get_name() { return name; }
+    std::string get_op_type() { return op_type; }
+    std::vector<std::string> get_inputs() { return inputs; }
+    std::vector<std::string> get_outputs() { return outputs; }
+    std::vector<MWNNAttribute> get_attributes() { return mwnn_attributes; }
   private:
     NodeProto node_proto;
     std::string name;

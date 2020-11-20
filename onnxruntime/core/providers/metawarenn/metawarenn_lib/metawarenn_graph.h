@@ -11,10 +11,15 @@ namespace metawarenn {
 class MWNNGraph {
   public:
     MWNNGraph(GraphProto& onnx_graph_proto, MWNNModel& model);
-    ~MWNNGraph();
+    std::string get_name() { return name; }
+    std::vector<MWNNTensor> get_graph_initializers() { return mwnn_initializer_tensors; }
+    std::vector<MWNNNode> get_graph_nodes() { return mwnn_nodes; }
+    std::vector<MWNNValueInfo> get_graph_inputs() { return mwnn_inputs; }
+    std::vector<MWNNValueInfo> get_graph_outputs() { return mwnn_outputs; }
   private:
     GraphProto graph_proto;
     MWNNModel mwnn_model;
+    std::string name;
     std::vector<MWNNTensor> mwnn_initializer_tensors;
     std::vector<MWNNNode> mwnn_nodes;
     std::vector<MWNNValueInfo> mwnn_inputs;
