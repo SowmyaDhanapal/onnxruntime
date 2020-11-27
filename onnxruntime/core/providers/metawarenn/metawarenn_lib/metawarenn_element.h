@@ -1,6 +1,14 @@
 #ifndef METAWARENN_ELEMENT_H_
 #define METAWARENN_ELEMENT_H_
 
+#ifdef ONNX_ML
+#include "onnx/onnx-ml.pb.h"
+#else
+#include "onnx/onnx.pb.h"
+#endif
+
+using namespace ONNX_NAMESPACE;
+
 namespace metawarenn {
 
 class ElementType {

@@ -3,6 +3,7 @@
 
 #include "metawarenn_model.h"
 #include "metawarenn_element.h"
+#include "op/constant.h"
 
 namespace metawarenn {
 
@@ -20,6 +21,9 @@ class MWNNTensor {
     int get_type() { return onnx_type; }
     std::vector<int64_t> get_dims() { return dims; }
     std::vector<float> get_tensor() { return tensor; }
+    std::shared_ptr<op::Node> get_constant_node() {
+      return std::make_shared<op::Constant>(name, dims, tensor, t_type);
+    }
   private:
     TensorProto tensor_proto;
     std::string name;

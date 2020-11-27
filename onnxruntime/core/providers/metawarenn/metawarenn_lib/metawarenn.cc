@@ -2,6 +2,7 @@
 
 namespace metawarenn {
 
+
 std::shared_ptr<Function> import_onnx_model(std::istream& stream) {
   std::cout << "\n import_onnx_model";
   ModelProto model_proto;
@@ -17,6 +18,40 @@ std::shared_ptr<Function> import_onnx_model(std::istream& stream) {
 
   std::cout << "\n ---------------------------Graph----------------------------- \n";
   std::cout << "\n Graph Name : " << mwnn_graph.get_name();
+  std::cout << "\n Graph Input Name : " << mwnn_graph.get_graph_ip_name();
+  std::cout << "\n Graph Output Name : " << mwnn_graph.get_graph_op_name();
+
+  std::vector<std::string> sorted_names;
+  //Sort Node names
+  {
+    for (auto g_n : mwnn_graph.get_graph_nodes()) {
+      std::cout << "\n Node name : " << g_n.get_name();
+      for (auto n_ip : g_n.get_inputs()) {
+        if(n_ip == mwnn_graph.get_graph_ip_name()) {
+          sorted_names.push_back(n_ip);
+          }
+        else if(mwnn_graph.mwnn_initializer_names.count(n_ip)) {
+          sorted_names.push_back(n_ip);
+          }
+        else if(std::count(sorted_names.begin(), sorted_names.end(), n_ip)) {
+          continue;
+          }
+        else {
+          std::cout << "\nERROR : Input Not available ";
+          std::cout << "\nInput Name : " << n_ip;
+          exit(1);
+        }
+      }
+      for (auto n_op : g_n.get_outputs()) {
+        std::cout << "\n" << n_op;
+        sorted_names.push_back(n_op);
+      }
+    }
+     for (auto itr = sorted_names.begin(); itr != sorted_names.end(); ++itr)
+    {
+        std::cout << "\n" << *itr;
+    }
+  }
   std::cout << "\n -----------------------Graph Inputs-------------------------- \n";
   for (auto g_ip : mwnn_graph.get_graph_inputs()) {
     std::cout << "\n Input Name : " << g_ip.get_name();
