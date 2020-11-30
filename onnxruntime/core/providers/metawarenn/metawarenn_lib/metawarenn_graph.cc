@@ -25,8 +25,11 @@ MWNNGraph::MWNNGraph(GraphProto& onnx_graph_proto, MWNNModel& model) {
     mwnn_inputs.emplace_back(mwnn_input);
     if(mwnn_initializer_names.count(mwnn_input.get_name()))
       continue;
-    else
+    else {
       ip_name = mwnn_input.get_name();
+      auto ip_node = mwnn_input.get_node();
+      mwnn_graph_nodes[ip_name] = std::move(*ip_node);
+    }
   }
   for (auto op_value_info_proto : graph_proto.output()) {
     MWNNValueInfo mwnn_output(op_value_info_proto);
