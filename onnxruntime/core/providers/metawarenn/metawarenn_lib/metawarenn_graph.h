@@ -20,6 +20,7 @@ class MWNNGraph {
     std::vector<MWNNValueInfo> get_graph_inputs() { return mwnn_inputs; }
     std::vector<MWNNValueInfo> get_graph_outputs() { return mwnn_outputs; }
     std::set<std::string> mwnn_initializer_names;
+    std::map<std::string, op::Node> mwnn_graph_nodes;
   private:
     GraphProto graph_proto;
     MWNNModel mwnn_model;
@@ -30,7 +31,6 @@ class MWNNGraph {
     std::vector<MWNNNode> mwnn_nodes;
     std::vector<MWNNValueInfo> mwnn_inputs;
     std::vector<MWNNValueInfo> mwnn_outputs;
-    std::map<std::string, op::Node> mwnn_graph_nodes;
 };
 
 } //namespace metawarenn

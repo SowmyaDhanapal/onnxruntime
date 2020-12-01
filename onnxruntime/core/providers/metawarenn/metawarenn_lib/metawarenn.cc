@@ -21,9 +21,9 @@ std::shared_ptr<Function> import_onnx_model(std::istream& stream) {
   std::cout << "\n Graph Input Name : " << mwnn_graph.get_graph_ip_name();
   std::cout << "\n Graph Output Name : " << mwnn_graph.get_graph_op_name();
 
-  std::vector<std::string> sorted_names;
   //Sort Node names
   {
+    std::vector<std::string> sorted_names;
     for (auto g_n : mwnn_graph.get_graph_nodes()) {
       std::cout << "\n Node name : " << g_n.get_name();
       for (auto n_ip : g_n.get_inputs()) {
@@ -43,13 +43,41 @@ std::shared_ptr<Function> import_onnx_model(std::istream& stream) {
         }
       }
       for (auto n_op : g_n.get_outputs()) {
-        std::cout << "\n" << n_op;
         sorted_names.push_back(n_op);
       }
     }
      for (auto itr = sorted_names.begin(); itr != sorted_names.end(); ++itr)
     {
         std::cout << "\n" << *itr;
+    }
+  }
+
+  //Sort Nodes
+  {
+  std::vector<op::Node> sorted_nodes;
+  std::vector<std::string> output_names;
+    for (auto g_n : mwnn_graph.get_graph_nodes()) {
+      std::cout << "\n Node name : " << g_n.get_name();
+      for (auto n_ip : g_n.get_inputs()) {
+        if(std::count(output_names.begin(), output_names.end(), n_ip)) {
+          continue;
+        }
+        else if(mwnn_graph.mwnn_graph_nodes.count(n_ip)) {
+          sorted_nodes.push_back(mwnn_graph.mwnn_graph_nodes[n_ip]);
+        }
+        else {
+          std::cout << "\nERROR : Input Not available ";
+          std::cout << "\nInput Name : " << n_ip;
+          exit(1);
+        }
+      }
+      sorted_nodes.push_back(mwnn_graph.mwnn_graph_nodes[g_n.get_name()]);
+      for (auto n_op : g_n.get_outputs()) {
+        output_names.push_back(n_op);
+      }
+    }
+    for (auto itr = sorted_nodes.begin(); itr != sorted_nodes.end(); ++itr) {
+        std::cout << "\n" << itr->name;
     }
   }
   std::cout << "\n -----------------------Graph Inputs-------------------------- \n";

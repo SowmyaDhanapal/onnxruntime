@@ -4,11 +4,11 @@ namespace metawarenn {
 
 namespace op {
 
-Constant::Constant(std::string name, std::vector<int64_t> shape, std::vector<float> data, ElementType::element_type data_type)
-         : Node(name, "Constant") {
-  shape = shape;
-  data = data;
-  data_type = data_type;
+Constant::Constant(std::string n_name, std::vector<int64_t> n_shape, std::vector<float> n_data, ElementType::element_type n_data_type)
+         : Node(n_name, "Constant") {
+  shape = n_shape;
+  data = n_data;
+  data_type = n_data_type;
   }
 } //namespace op
 

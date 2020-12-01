@@ -5,10 +5,10 @@ namespace metawarenn {
 namespace op {
 
 Node::Node() { }
-Node::Node(std::string name, std::string node_type) {
-  name = name;
-  node_type = node_type;
-  std::cout << "\n Name : " << name << " Type : " << node_type;
+Node::Node(std::string n_name, std::string n_type) {
+  name = n_name;
+  type = n_type;
+  std::cout << "\n Name : " << name << " Type : " << type;
   }
 
 } //namespace op

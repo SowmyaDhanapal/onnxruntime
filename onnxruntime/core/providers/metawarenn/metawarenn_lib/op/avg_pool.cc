@@ -4,10 +4,10 @@ namespace metawarenn {
 
 namespace op {
 
-AvgPool::AvgPool(std::string name, std::vector<std::string> inputs,
-                 std::vector<std::string> outputs) : Node(name, "AvgPool") {
-  inputs = inputs;
-  outputs = outputs;
+AvgPool::AvgPool(std::string n_name, std::vector<std::string> n_inputs,
+                 std::vector<std::string> n_outputs) : Node(n_name, "AvgPool") {
+  inputs = n_inputs;
+  outputs = n_outputs;
   }
 } //namespace op
 

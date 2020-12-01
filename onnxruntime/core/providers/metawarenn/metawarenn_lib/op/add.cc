@@ -4,10 +4,10 @@ namespace metawarenn {
 
 namespace op {
 
-Add::Add(std::string name, std::vector<std::string> inputs,
-         std::vector<std::string> outputs) : Node(name, "Add") {
-  inputs = inputs;
-  outputs = outputs;
+Add::Add(std::string n_name, std::vector<std::string> n_inputs,
+         std::vector<std::string> n_outputs) : Node(n_name, "Add") {
+  inputs = n_inputs;
+  outputs = n_outputs;
   }
 } //namespace op
 

@@ -10,9 +10,9 @@ namespace op {
 class Node {
   public:
     Node();
-    Node(std::string name, std::string node_type);
+    Node(std::string n_name, std::string n_type);
     std::string name;
-    std::string node_type;
+    std::string type;
 };
 } //namespace op
 
