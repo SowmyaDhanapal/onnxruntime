@@ -2,7 +2,7 @@
 
 ### Prerequisites 
    1. `git clone --recursive https://github.com/SowmyaDhanapal/onnxruntime.git`  
-   2. Install cmake-3.13 or higher
+   2. Install cmake-3.13 or higher. You can download it from https://cmake.org/download/  
    3. Install gcc/g++ 7
 
 ### Steps to build
