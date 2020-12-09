@@ -28,6 +28,10 @@ std::shared_ptr<Function> import_onnx_model(std::istream& stream) {
   manager.register_pass(d_pass3);
   manager.run_passes();
 
+  //To generate a High Level MetaWareNN Format
+  convert_to_mwnn_format(mwnn_graph);
+  exit(1);
+
   std::cout << "\n ---------------------------Graph----------------------------- \n";
   std::cout << "\n Graph Name : " << mwnn_graph.get_name();
   std::cout << "\n Graph Input Name : " << mwnn_graph.get_graph_ip_name();
@@ -92,6 +96,7 @@ std::shared_ptr<Function> import_onnx_model(std::istream& stream) {
         std::cout << "\n" << itr->name;
     }
   }
+
   std::cout << "\n -----------------------Graph Inputs-------------------------- \n";
   for (auto g_ip : mwnn_graph.get_graph_inputs()) {
     std::cout << "\n Input Name : " << g_ip.get_name();

@@ -10,6 +10,7 @@
 #include "optimizer/metawarenn_optimizer.h"
 #include "optimizer/dummy_pass_1.h"
 #include "optimizer/dummy_pass_2.h"
+#include "metawarenn_utils.h"
 
 namespace metawarenn {
 
