@@ -2,7 +2,6 @@
 
 namespace metawarenn {
 
-
 std::shared_ptr<Function> import_onnx_model(std::istream& stream) {
   std::cout << "\n import_onnx_model";
   ModelProto model_proto;
@@ -15,6 +14,19 @@ std::shared_ptr<Function> import_onnx_model(std::istream& stream) {
 
   MWNNModel mwnn_model(model_proto);
   MWNNGraph mwnn_graph(graph_proto, mwnn_model);
+
+  //Call Passes
+  optimizer::PassManager manager;
+  optimizer::DummyPass1 d_pass1(7);
+  std::cout << "\n MetaWareNNCC : " << d_pass1.get_name();
+  optimizer::DummyPass2 d_pass2;
+  std::cout << "\n MetaWareNNCC : " << d_pass2.get_name();
+  optimizer::DummyPass1 d_pass3;
+  std::cout << "\n MetaWareNNCC : " << d_pass3.get_name();
+  manager.register_pass(d_pass1);
+  manager.register_pass(d_pass2);
+  manager.register_pass(d_pass3);
+  manager.run_passes();
 
   std::cout << "\n ---------------------------Graph----------------------------- \n";
   std::cout << "\n Graph Name : " << mwnn_graph.get_name();
