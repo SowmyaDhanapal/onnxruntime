@@ -83,7 +83,7 @@ MLI_FORCE_INLINE void convolution2D(
             const int clmns = weights.kernel_width - comp.right - comp.left;
             const int h_idx_in = (H_idx * stride_height - padding_top + comp.top);
             const int w_idx_in = (W_idx * stride_width - padding_left + comp.left);
-            for (int out_ch_idx = 0; out_ch_idx < out.ch - 2; out_ch_idx++) {
+            for (int out_ch_idx = 0; out_ch_idx < out.ch; out_ch_idx++) {
 
                 MLI_CONV_OUT_PTR(io_T) out_ptr = out.ptr
                         + out.row_mem_stride * H_idx
