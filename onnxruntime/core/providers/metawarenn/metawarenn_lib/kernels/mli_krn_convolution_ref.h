@@ -219,6 +219,7 @@ MLI_FORCE_INLINE void depthwise_convolution2D(
             } // for in_ch_idx
         } // for W_idx
     } // for H_idx
+    std::cout << "\n\nDepthwise Convolution kernel executed successfully!\n";
 }
 
 //====================================================================================
