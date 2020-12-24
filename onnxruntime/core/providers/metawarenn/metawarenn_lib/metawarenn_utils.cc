@@ -205,7 +205,71 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph)
     }
     else if (op_type =="GlobalAveragePool")
     {
-      exit(1);
+      mli_tensor output_tensor;
+      auto input = g_n.get_inputs();
+      std::cout << "\nInput node : " << input[0];
+      auto shape = (tensor_map.find(input[0]))->second.shape;
+      int buf_size = 1;
+      int rank = (tensor_map.find(input[0]))->second.rank;
+      int start = 0, end = rank - 1;
+      for (int i = 0; i < rank; i++)
+      {
+        buf_size = buf_size * shape[i];
+      }
+
+      // Data layout conversion from CHW to HWC
+      int16_t *input_buf = (int16_t *)(tensor_map.find(input[0]))->second.data.mem.void_p;//chw
+      int16_t *new_input_buf = (int16_t*)malloc(buf_size * sizeof(int16_t));//hwc
+      int channel = (tensor_map.find(input[0]))->second.shape[FMAP_C_DIM_CHW];
+      int width = (tensor_map.find(input[0]))->second.shape[FMAP_W_DIM_CHW];
+      int height = (tensor_map.find(input[0]))->second.shape[FMAP_H_DIM_CHW];
+
+      for (int i = 0; i < channel; i++) {
+        for(int j = 0; j < height; j++) {
+          for(int k = 0; k < width; k++) {
+            new_input_buf[i + (j * width * channel) + (k * channel)] = input_buf[(i * height * width) + (j * width) + k];
+          }
+        }
+      }
+      (tensor_map.find(input[0]))->second.data.mem.void_p = (void*)new_input_buf;
+      (tensor_map.find(input[0]))->second.shape[FMAP_H_DIM_HWC] = height;
+      (tensor_map.find(input[0]))->second.shape[FMAP_W_DIM_HWC] = width;
+      (tensor_map.find(input[0]))->second.shape[FMAP_C_DIM_HWC] = channel;
+
+      create_mwnn_tensor_output(&output_tensor, buf_size);
+
+      mli_pool_cfg pool_cfg;
+      pool_cfg.kernel_width = width;
+      pool_cfg.kernel_height = height;
+      pool_cfg.stride_width = 1;
+      pool_cfg.stride_height = 1;
+      pool_cfg.padding_top = 0;
+      pool_cfg.padding_bottom = 0;
+      pool_cfg.padding_left = 0;
+      pool_cfg.padding_right = 0;
+
+      mli::krn::mli_krn_avepool_hwc<int16_t, mli_fx16_accu_t, 0>(&(tensor_map.find(input[0]))->second, &pool_cfg, &output_tensor);
+
+      // Data layout conversion from HWC to CHW
+      channel = output_tensor.shape[FMAP_C_DIM_HWC];
+      width = output_tensor.shape[FMAP_W_DIM_HWC];
+      height = output_tensor.shape[FMAP_H_DIM_HWC];
+      input_buf = (int16_t *)output_tensor.data.mem.void_p;//hwc
+      new_input_buf = (int16_t*)malloc(buf_size * sizeof(int16_t));//chw
+
+      for(int i = 0; i < height; i++) {
+        for(int j = 0; j < width; j++) {
+          for(int k = 0; k < channel; k++) {
+            new_input_buf[(i * width) + (j) +(k * height * width)] = (int16_t)(input_buf[(i * width * channel) + (j * channel) + k]);
+          }
+        }
+      }
+      output_tensor.data.mem.void_p = (void*)new_input_buf;
+      output_tensor.shape[FMAP_H_DIM_CHW] = height;
+      output_tensor.shape[FMAP_W_DIM_CHW] = width;
+      output_tensor.shape[FMAP_C_DIM_CHW] = channel;
+      output_tensor.shape[3] = 1;
+      tensor_map.insert(std::pair<std::string, mli_tensor>(g_n.get_outputs()[0], output_tensor));
     }
   }
 }
