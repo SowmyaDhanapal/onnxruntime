@@ -119,9 +119,9 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph)
       auto dilations = g_n.get_attribute_value("dilations");
       conv_cfg.stride_height = strides[0];
       conv_cfg.stride_width = strides[1];
-      conv_cfg.padding_bottom = pads[0];
-      conv_cfg.padding_top = pads[1];
-      conv_cfg.padding_left = pads[2];
+      conv_cfg.padding_top = pads[0];
+      conv_cfg.padding_left = pads[1];
+      conv_cfg.padding_bottom = pads[2];
       conv_cfg.padding_right = pads[3];
       conv_cfg.dilation_height = dilations[0];
       conv_cfg.dilation_width = dilations[1];
