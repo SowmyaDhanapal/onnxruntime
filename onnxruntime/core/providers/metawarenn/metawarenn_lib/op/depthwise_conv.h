@@ -6,9 +6,9 @@ namespace metawarenn {
 
 namespace op {
 
-class Conv : public Node {
+class DepthwiseConv : public Node {
   public:
-    Conv(std::string n_name, std::vector<std::string> n_inputs,
+    DepthwiseConv(std::string n_name, std::vector<std::string> n_inputs,
          std::vector<std::string> n_outputs,
          std::vector<float> n_dilations,
          std::vector<float> n_strides,

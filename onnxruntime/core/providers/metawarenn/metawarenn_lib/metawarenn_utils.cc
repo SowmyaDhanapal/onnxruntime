@@ -80,6 +80,24 @@ void create_mwnn_tensor_output(mli_tensor *mwnn_tensor, long int buf_size)
   std::cout << "\nOutput's data capacity: " << mwnn_tensor->data.capacity;
 }
 
+int arg_max(mli_tensor * net_output, int size) {
+    int arg_max = 0;
+
+    int16_t *out_16 = (int16_t *)(net_output->data.mem.void_p);
+    int16_t max_16 = out_16[0];
+    std::cout << "\nsize: " << size;
+
+    for (int idx = 0; idx < size; ++idx)
+    {
+        if (max_16 < out_16[idx])
+        {
+            arg_max = idx;
+            max_16 = out_16[idx];
+        }
+    }
+    return arg_max;
+}
+
 void convert_to_mwnn_format(MWNNGraph mwnn_graph)
 {
     std::map<std::string, mli_tensor> tensor_map;
@@ -92,15 +110,13 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph)
     std::string output_name;
     std::cout << "\nNode name : " << g_n.get_name();
     std::string op_type = g_n.get_op_type();
-    std::cout << "\nOptype : " << op_type;
-    if (op_type == "Conv")
+    if (op_type == "Conv" || op_type == "DepthwiseConv")
     {
       mli_conv2d_cfg conv_cfg;
       int kernel_height, kernel_width, channels;
       auto strides = g_n.get_attribute_value("strides");
       auto pads = g_n.get_attribute_value("pads");
       auto dilations = g_n.get_attribute_value("dilations");
-      auto group = g_n.get_attribute_value("group");
       conv_cfg.stride_height = strides[0];
       conv_cfg.stride_width = strides[1];
       conv_cfg.padding_bottom = pads[0];
@@ -138,7 +154,7 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph)
       fill_mwnn_tensor_initalizer(inputs[1], mwnn_graph, &conv_wt, &kernel_height, &kernel_width, &channels);
       auto input = g_n.get_inputs()[0];
       // Handles the initial graph input to the first conv node and updates tensor map
-      if(input == mwnn_graph.get_graph_inputs()[0].get_name())
+      if(input == mwnn_graph.get_graph_ip_name())
       {
         fill_mwnn_tensor_input(mwnn_graph.get_graph_inputs()[0], &input_tensor);
         tensor_map.insert(std::pair<std::string, mli_tensor>(input, input_tensor));
@@ -155,7 +171,7 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph)
       create_mwnn_tensor_output(&output_tensor, out_width * out_height * channels);
       std::cout << "\nInput node: " << input;
       // General convolution invocation
-      if((int)group[0] == 1)
+      if(op_type == "Conv")
       {
         mli::krn::ref::conv2d_prepare_and_run<int16_t, int16_t, int16_t, mli_fx16_accu_t, mli::krn::fx_quant_specific_params, LAYOUT_CHW,  mli::CONV_GENERAL>(
           &(tensor_map.find(input))->second,
@@ -164,7 +180,7 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph)
           &conv_cfg, &output_tensor);
       }
       // Depthwise convolution invocation
-      else
+      else if(op_type ==  "DepthwiseConv")
       {
         mli::krn::ref::conv2d_prepare_and_run<int16_t, int16_t, int16_t, mli_fx16_accu_t, mli::krn::fx_quant_specific_params, LAYOUT_CHW,  mli::CONV_DEPTHWISE>(
           &(tensor_map.find(input))->second,
@@ -271,7 +287,16 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph)
       output_tensor.shape[3] = 1;
       tensor_map.insert(std::pair<std::string, mli_tensor>(g_n.get_outputs()[0], output_tensor));
     }
+    else if (op_type =="Reshape")
+    {
+      auto input = g_n.get_inputs();
+      tensor_map.insert(std::pair<std::string, mli_tensor>(g_n.get_name(), (tensor_map.find(input[0]))->second));
+    }
   }
+  std::cout << mwnn_graph.get_graph_op_name();
+  mli_tensor output = (tensor_map.find(mwnn_graph.get_graph_op_name()))->second;
+  int predicted_label = arg_max(&output, output.shape[0]);
+  std::cout << "\npredicted label: " << predicted_label;
 }
 
 } //namespace metawarenn
