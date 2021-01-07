@@ -15,9 +15,19 @@ std::shared_ptr<Function> import_onnx_model(std::istream& stream) {
   MWNNModel mwnn_model(model_proto);
   MWNNGraph mwnn_graph(graph_proto, mwnn_model);
 
-  //Call Passes
   optimizer::PassManager manager;
-  optimizer::DummyPass1 d_pass1(7);
+  auto node_list = mwnn_graph.get_graph_nodes();
+  for (int node_idx = 0; node_idx < mwnn_graph.get_graph_nodes().size() ; node_idx++) {
+    auto g_n = node_list[node_idx];
+    if(g_n.get_op_type() == "Reshape") {
+      optimizer::RemoveReshape rr(&mwnn_graph, g_n);
+      std::cout << "\n MetaWareNNCC : " << rr.get_name();
+      manager.register_pass(rr);
+    }
+  }
+
+  //Call Passes
+  /*optimizer::DummyPass1 d_pass1(7);
   std::cout << "\n MetaWareNNCC : " << d_pass1.get_name();
   optimizer::DummyPass2 d_pass2;
   std::cout << "\n MetaWareNNCC : " << d_pass2.get_name();
@@ -25,9 +35,8 @@ std::shared_ptr<Function> import_onnx_model(std::istream& stream) {
   std::cout << "\n MetaWareNNCC : " << d_pass3.get_name();
   manager.register_pass(d_pass1);
   manager.register_pass(d_pass2);
-  manager.register_pass(d_pass3);
+  manager.register_pass(d_pass3);*/
   manager.run_passes();
-
   //To generate a High Level MetaWareNN Format
   convert_to_mwnn_format(mwnn_graph);
   exit(1);

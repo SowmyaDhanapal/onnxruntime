@@ -1,6 +1,8 @@
 #pragma once
 
 #include <iostream>
+#include "../metawarenn_graph.h"
+#include "../metawarenn_node.h"
 
 namespace metawarenn {
 

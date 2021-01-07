@@ -3,6 +3,7 @@
 #include "metawarenn_optimizer.h"
 #include "dummy_pass_1.h"
 #include "dummy_pass_2.h"
+#include "remove_reshape.h"
 #include <vector>
 #include <memory>
 

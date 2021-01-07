@@ -14,6 +14,7 @@ namespace metawarenn {
 
 class MWNNNode {
   public:
+    MWNNNode() = default;
     MWNNNode(NodeProto& onnx_node_proto);
     std::string get_name() { return name; }
     std::string get_op_type() { return op_type; }
