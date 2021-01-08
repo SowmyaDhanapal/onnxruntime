@@ -24,6 +24,11 @@ std::shared_ptr<Function> import_onnx_model(std::istream& stream) {
       std::cout << "\n MetaWareNNCC : " << rr.get_name();
       manager.register_pass(rr);
     }
+    else if(g_n.get_op_type() == "Relu") {
+      optimizer::FuseRelu fr(&mwnn_graph, g_n);
+      std::cout << "\n MetaWareNNCC : " << fr.get_name();
+      manager.register_pass(fr);
+    }
   }
 
   //Call Passes

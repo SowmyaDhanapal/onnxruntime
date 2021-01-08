@@ -135,14 +135,8 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph)
       // Get the next relu node to fuse with conv+BN and update the output_name to fetch as i/p for next conv node
       output_name = g_n.get_outputs()[0];
       conv_cfg.relu.type = MLI_RELU_NONE;
-      if(node_idx < (mwnn_graph.get_graph_nodes().size()-1)) {
-        auto next_node = node_list[node_idx+1];
-        if (next_node.get_op_type() == "Relu")
-        {
-          output_name = next_node.get_name();
-          conv_cfg.relu.type = MLI_RELU_GEN;
-        }
-      }
+      if(g_n.get_attribute_value("activation")[0])
+        conv_cfg.relu.type = MLI_RELU_GEN;
       mli_tensor input_tensor;
       mli_tensor conv_wt;
       mli_tensor conv_bias;

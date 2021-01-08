@@ -75,6 +75,20 @@ class MWNNGraph {
       mwnn_graph_nodes.erase(name);
       std::cout << "\n mwnn_graph_nodes size after: " << mwnn_graph_nodes.size();
     }
+    void update_inputs(std::string node_name, std::string ip_name, int index) {
+      auto it = std::find_if(
+      std::begin(mwnn_nodes), std::end(mwnn_nodes), [&](MWNNNode& node) {
+          return node.get_name() == node_name;
+      });
+      return it->set_inputs(ip_name, index);
+    }
+    void update_outputs(std::string node_name, std::string op_name, int index) {
+      auto it = std::find_if(
+      std::begin(mwnn_nodes), std::end(mwnn_nodes), [&](MWNNNode& node) {
+          return node.get_name() == node_name;
+      });
+      return it->set_outputs(op_name, index);
+    }
     std::vector<MWNNNode> get_graph_nodes() { return mwnn_nodes; }
     std::vector<MWNNValueInfo> get_graph_inputs() { return mwnn_inputs; }
     std::vector<MWNNValueInfo> get_graph_outputs() { return mwnn_outputs; }

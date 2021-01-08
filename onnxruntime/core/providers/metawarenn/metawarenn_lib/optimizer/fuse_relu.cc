@@ -1,42 +1,35 @@
-#include "remove_reshape.h"
+#include "fuse_relu.h"
 
 namespace metawarenn {
 
 namespace optimizer {
 
-RemoveReshape::RemoveReshape() {
-  set_name("RemoveReshape");
+FuseRelu::FuseRelu() {
+  set_name("FuseRelu");
 }
-RemoveReshape::RemoveReshape(MWNNGraph* mwnn_graph, MWNNNode mwnn_node) {
-  set_name("RemoveReshape");
+FuseRelu::FuseRelu(MWNNGraph* mwnn_graph, MWNNNode mwnn_node) {
+  set_name("FuseRelu");
   graph = mwnn_graph;
   node = mwnn_node;
 }
-void RemoveReshape::RunPass() {
-  //Remove initializer tensor from graph
-  graph->remove_initializer_tensor(node.get_inputs()[1]);
-  graph->remove_initializer_names(node.get_inputs()[1]);
-  graph->remove_inputs(node.get_inputs()[1]);
-
+void FuseRelu::RunPass() {
   for (auto g_n : graph->get_graph_nodes()) {
     //To get consumer of current op
     for(int i = 0; i < (g_n.get_inputs()).size(); i++) {
       if(node.get_outputs()[0] == g_n.get_inputs()[i]) {
-        graph->update_inputs(g_n.get_name(), node.get_inputs()[0], i);
         consumers.insert(g_n.get_name());
       }
     }
     //To get producer of current op
     for(int i = 0; i < (g_n.get_outputs()).size(); i++) {
       if(node.get_inputs()[0] == g_n.get_outputs()[i]) {
+        graph->update_outputs(g_n.get_name(), node.get_name(), i);
         producers.insert(g_n.get_name());
+        if(g_n.get_op_type() == "Conv" or g_n.get_op_type() == "DepthwiseConv") {
+          g_n.update_attribute_value("activation", {1});
+        }
       }
     }
-  }
-  for (auto n_op : node.get_outputs()) {
-    graph->remove_outputs(n_op);
-    if(n_op == graph->get_graph_op_name())
-      graph->set_graph_op_name(node.get_inputs()[0]);
   }
   /*for (auto itr = consumers.begin(); itr != consumers.end(); ++itr) {
     std::cout << "\nConsumers : " << *itr;

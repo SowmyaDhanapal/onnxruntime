@@ -6,10 +6,10 @@ namespace metawarenn {
 
 namespace optimizer {
 
-class RemoveReshape : public MWNNOptimizer {
+class FuseRelu : public MWNNOptimizer {
   public:
-    RemoveReshape();
-    RemoveReshape(MWNNGraph* mwnn_graph, MWNNNode mwnn_node);
+    FuseRelu();
+    FuseRelu(MWNNGraph* mwnn_graph, MWNNNode mwnn_node);
     void RunPass() override;
 };
 
