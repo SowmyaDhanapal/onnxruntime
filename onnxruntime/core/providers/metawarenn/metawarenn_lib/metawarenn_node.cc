@@ -20,5 +20,9 @@ MWNNNode::MWNNNode(NodeProto& onnx_node_proto) {
       op_type = (int)mwnn_attribute.get_data()[0] == 1 ? "Conv" : "DepthwiseConv";
     }
   }
+  if(op_type == "Conv" or op_type == "DepthwiseConv") {
+    MWNNAttribute mwnn_attribute("activation", {0});
+    mwnn_attributes.emplace_back(mwnn_attribute);
+  }
 }
 } //namespace metawarenn

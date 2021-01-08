@@ -104,7 +104,7 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph)
     std::cout << "\n======================================================================================================================= \n";
   std::cout << "\n --------------------------------- Conversion to MetaWareNN High Level Graph Format -----------------------------------\n";
   auto node_list = mwnn_graph.get_graph_nodes();
-  for (int node_idx =0; node_idx < mwnn_graph.get_graph_nodes().size() ; node_idx++) {
+  for (int node_idx = 0; node_idx < mwnn_graph.get_graph_nodes().size() ; node_idx++) {
     std::cout << "\n======================================================================================================================= \n";
     auto g_n = node_list[node_idx];
     std::string output_name;
@@ -133,17 +133,10 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph)
       std::cout << "\ndilation_height : " << (int)conv_cfg.dilation_height;
       std::cout << "\ndilation_width : " << (int)conv_cfg.dilation_width;
       // Get the next relu node to fuse with conv+BN and update the output_name to fetch as i/p for next conv node
-      auto next_node = node_list[node_idx+1];
-      if (next_node.get_op_type() == "Relu")
-      {
-        output_name = next_node.get_name();
+      output_name = g_n.get_outputs()[0];
+      conv_cfg.relu.type = MLI_RELU_NONE;
+      if(g_n.get_attribute_value("activation")[0])
         conv_cfg.relu.type = MLI_RELU_GEN;
-      }
-      else
-      {
-        output_name = g_n.get_outputs()[0];
-        conv_cfg.relu.type = MLI_RELU_NONE;
-      }
       mli_tensor input_tensor;
       mli_tensor conv_wt;
       mli_tensor conv_bias;

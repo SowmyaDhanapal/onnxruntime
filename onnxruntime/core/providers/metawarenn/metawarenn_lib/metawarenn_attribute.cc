@@ -8,6 +8,11 @@ MWNNAttribute::MWNNAttribute(AttributeProto& onnx_attribute_proto) {
   type = attribute_proto.type();
   set_data();
 }
+MWNNAttribute::MWNNAttribute(std::string m_name, int m_data) {
+  name = m_name;
+  type = AttributeProto_AttributeType_INT;
+  data.push_back(m_data);
+}
 
 void MWNNAttribute::set_data() {
   switch(get_t_type()) {
@@ -50,5 +55,9 @@ void MWNNAttribute::set_data() {
       exit(1);
       break;
   }
+}
+void MWNNAttribute::set_data(int m_data) {
+    data.clear();
+    data.push_back(m_data);
 }
 } //namespace metawarenn

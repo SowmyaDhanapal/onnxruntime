@@ -14,11 +14,14 @@ namespace metawarenn {
 
 class MWNNNode {
   public:
+    MWNNNode() = default;
     MWNNNode(NodeProto& onnx_node_proto);
     std::string get_name() { return name; }
     std::string get_op_type() { return op_type; }
     std::vector<std::string> get_inputs() { return inputs; }
     std::vector<std::string> get_outputs() { return outputs; }
+    void set_inputs(std::string name, int index) { inputs[index] = name; }
+    void set_outputs(std::string name, int index) { outputs[index] = name; }
     std::vector<MWNNAttribute> get_attributes() { return mwnn_attributes; }
 
     std::vector<float> get_attribute_value(std::string name) {
@@ -30,6 +33,16 @@ class MWNNNode {
           std::cout << "\n ERROR : End of Attributes!!! - Couldn't find " << name;
       }
       return it->get_data();
+    }
+    void update_attribute_value(std::string name, int value) {
+      auto it = std::find_if(
+      std::begin(mwnn_attributes), std::end(mwnn_attributes), [&](MWNNAttribute& attribute) {
+          return attribute.get_name() == name;
+      });
+      if (it == std::end(mwnn_attributes)) {
+          std::cout << "\n ERROR : End of Attributes!!! - Couldn't find " << name << " while updating its value!!!";
+      }
+      return it->set_data(value);
     }
     std::vector<std::string> get_attribute_string(std::string name) {
       auto it = std::find_if(
