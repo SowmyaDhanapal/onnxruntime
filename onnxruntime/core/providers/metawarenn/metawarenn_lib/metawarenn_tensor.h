@@ -15,6 +15,7 @@ inline std::vector<T> get_data(const Container& container)
 
 class MWNNTensor {
   public:
+    MWNNTensor() = default;
     MWNNTensor(TensorProto& onnx_tensor_proto);
     void set_tensor();
     std::string get_name() { return name; }
@@ -23,6 +24,10 @@ class MWNNTensor {
     std::vector<float> get_tensor() { return tensor; }
     std::shared_ptr<op::Node> get_constant_node() {
       return std::make_shared<op::Constant>(name, dims, tensor, t_type);
+    }
+    void update_tensor(std::vector<int64_t> n_dims, std::vector<float> n_tensor) {
+      dims = n_dims;
+      tensor = n_tensor;
     }
   private:
     TensorProto tensor_proto;

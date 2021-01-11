@@ -2,7 +2,6 @@
 
 #include <iostream>
 #include "../metawarenn_graph.h"
-#include "../metawarenn_node.h"
 
 namespace metawarenn {
 
@@ -20,6 +19,8 @@ class MWNNOptimizer {
   protected:
     MWNNGraph *graph;
     MWNNNode node;
+    MWNNTensor tensor;
+    MWNNValueInfo value_info;
     std::set<std::string> producers;
     std::set<std::string> consumers;
 };
