@@ -11,6 +11,7 @@
 #include "optimizer/remove_reshape.h"
 #include "metawarenn_utils.h"
 
+#define CHW_TO_HWC 1
 namespace metawarenn {
 
   std::shared_ptr<Function> import_onnx_model(std::istream& stream);
