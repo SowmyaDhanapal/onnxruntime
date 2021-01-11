@@ -8,8 +8,6 @@
 #include "metawarenn_graph.h"
 #include "optimizer/pass_manager.h"
 #include "optimizer/metawarenn_optimizer.h"
-#include "optimizer/dummy_pass_1.h"
-#include "optimizer/dummy_pass_2.h"
 #include "optimizer/remove_reshape.h"
 #include "metawarenn_utils.h"
 
