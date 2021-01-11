@@ -20,8 +20,8 @@ void fill_mwnn_tensor_initalizer(std::string input_name, MWNNGraph mwnn_graph, m
   if (dims.size() > 1)
   {
     *ch = (int)dims[0];
-    *k_height = (int)dims[2];
-    *k_width = (int)dims[3];
+    *k_height = (int)dims[1];
+    *k_width = (int)dims[2];
   }
   std::cout << "\nDimension size: ";
   for (i = 0; i < dims.size(); i++)
@@ -153,8 +153,8 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph)
         tensor_map.insert(std::pair<std::string, mli_tensor>(input, input_tensor));
       }
       // Output buffer size calculation
-      int input_height = (tensor_map.find(input))->second.shape[1];
-      int input_width = (tensor_map.find(input))->second.shape[2];
+      int input_height = (tensor_map.find(input))->second.shape[0];
+      int input_width = (tensor_map.find(input))->second.shape[1];
       int effective_kernel_width = (kernel_width - 1) * conv_cfg.dilation_width + 1;
       int effective_kernel_height = (kernel_height - 1) * conv_cfg.dilation_height + 1;
       const int out_width  = CEIL_DIV(input_width + conv_cfg.padding_left + conv_cfg.padding_right - effective_kernel_width + 1,
@@ -166,7 +166,7 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph)
       // General convolution invocation
       if(op_type == "Conv")
       {
-        mli::krn::ref::conv2d_prepare_and_run<int16_t, int16_t, int16_t, mli_fx16_accu_t, mli::krn::fx_quant_specific_params, LAYOUT_CHW,  mli::CONV_GENERAL>(
+        mli::krn::ref::conv2d_prepare_and_run<int16_t, int16_t, int16_t, mli_fx16_accu_t, mli::krn::fx_quant_specific_params, LAYOUT_HWC,  mli::CONV_GENERAL>(
           &(tensor_map.find(input))->second,
           &conv_wt,
           &conv_bias,
@@ -175,7 +175,7 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph)
       // Depthwise convolution invocation
       else if(op_type ==  "DepthwiseConv")
       {
-        mli::krn::ref::conv2d_prepare_and_run<int16_t, int16_t, int16_t, mli_fx16_accu_t, mli::krn::fx_quant_specific_params, LAYOUT_CHW,  mli::CONV_DEPTHWISE>(
+        mli::krn::ref::conv2d_prepare_and_run<int16_t, int16_t, int16_t, mli_fx16_accu_t, mli::krn::fx_quant_specific_params, LAYOUT_HWC,  mli::CONV_DEPTHWISE>(
           &(tensor_map.find(input))->second,
           &conv_wt,
           &conv_bias,
