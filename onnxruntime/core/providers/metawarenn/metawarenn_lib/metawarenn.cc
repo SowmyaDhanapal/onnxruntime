@@ -17,25 +17,27 @@ std::shared_ptr<Function> import_onnx_model(std::istream& stream) {
 
   optimizer::PassManager manager;
   auto node_list = mwnn_graph.get_graph_nodes();
-
-  for (auto g_t : mwnn_graph.get_graph_initializers()) {
-    if(g_t.get_dims().size() == 4) {
-      std::cout << "\n Name : " << g_t.get_name();
-      std::cout << "\t Dims : ";
-      for (auto dim : g_t.get_dims())
-        std::cout << dim << ",";
-      optimizer::ConvertLayout cl(&mwnn_graph, g_t, 1, 0);
-      manager.register_pass(cl);
+  if(CHW_TO_HWC)
+  {
+    for (auto g_t : mwnn_graph.get_graph_initializers()) {
+      if(g_t.get_dims().size() == 4) {
+        std::cout << "\n Name : " << g_t.get_name();
+        std::cout << "\t Dims : ";
+        for (auto dim : g_t.get_dims())
+          std::cout << dim << ",";
+        optimizer::ConvertLayout cl(&mwnn_graph, g_t, CHW_TO_HWC, 0);
+        manager.register_pass(cl);
+      }
     }
-  }
-  for (auto g_t : mwnn_graph.get_graph_inputs()) {
-    if(g_t.get_dims().size() == 4) {
-      std::cout << "\n Name : " << g_t.get_name();
-      std::cout << "\t Dims : ";
-      for (auto dim : g_t.get_dims())
-        std::cout << dim << ",";
-      optimizer::ConvertLayout cl(&mwnn_graph, g_t, 1, 0);
-      manager.register_pass(cl);
+    for (auto g_t : mwnn_graph.get_graph_inputs()) {
+      if(g_t.get_dims().size() == 4) {
+        std::cout << "\n Name : " << g_t.get_name();
+        std::cout << "\t Dims : ";
+        for (auto dim : g_t.get_dims())
+          std::cout << dim << ",";
+        optimizer::ConvertLayout cl(&mwnn_graph, g_t, CHW_TO_HWC, 0);
+        manager.register_pass(cl);
+      }
     }
   }
   for (int node_idx = 0; node_idx < mwnn_graph.get_graph_nodes().size(); node_idx++) {
@@ -53,7 +55,7 @@ std::shared_ptr<Function> import_onnx_model(std::istream& stream) {
   }
   manager.run_passes();
   //To generate a High Level MetaWareNN Format
-  convert_to_mwnn_format(mwnn_graph);
+  convert_to_mwnn_format(mwnn_graph, CHW_TO_HWC);
   exit(1);
 
   std::cout << "\n ---------------------------Graph----------------------------- \n";
