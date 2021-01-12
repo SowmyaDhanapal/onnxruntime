@@ -94,7 +94,7 @@ std::shared_ptr<Function> import_onnx_model(std::istream& stream) {
 
   //Sort Nodes
   {
-  std::vector<op::Node> sorted_nodes;
+  std::vector<std::shared_ptr<op::Node>> sorted_nodes;
   std::vector<std::string> output_names;
     for (auto g_n : mwnn_graph.get_graph_nodes()) {
       std::cout << "\n Node name : " << g_n.get_name();
@@ -116,7 +116,7 @@ std::shared_ptr<Function> import_onnx_model(std::istream& stream) {
         output_names.push_back(n_op);
       }
     }
-    for (auto itr = sorted_nodes.begin(); itr != sorted_nodes.end(); ++itr) {
+    for (auto& itr : sorted_nodes) {
         std::cout << "\n" << itr->name;
     }
   }

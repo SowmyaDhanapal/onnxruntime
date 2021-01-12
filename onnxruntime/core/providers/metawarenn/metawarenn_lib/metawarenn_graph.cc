@@ -12,13 +12,13 @@ MWNNGraph::MWNNGraph(GraphProto& onnx_graph_proto, MWNNModel& model) {
     mwnn_initializer_tensors.emplace_back(mwnn_tensor);
     mwnn_initializer_names.insert(mwnn_tensor.get_name());
     auto const_node = mwnn_tensor.get_constant_node();
-    mwnn_graph_nodes[mwnn_tensor.get_name()] = std::move(*const_node);
+    mwnn_graph_nodes[mwnn_tensor.get_name()] = std::move(const_node);
   }
   for (auto node_proto : graph_proto.node()) {
     MWNNNode mwnn_node(node_proto);
     mwnn_nodes.emplace_back(mwnn_node);
     auto node = mwnn_node.get_node();
-    mwnn_graph_nodes[mwnn_node.get_name()] = std::move(*node);
+    mwnn_graph_nodes[mwnn_node.get_name()] = std::move(node);
   }
   for (auto ip_value_info_proto : graph_proto.input()) {
     MWNNValueInfo mwnn_input(ip_value_info_proto);
@@ -28,7 +28,7 @@ MWNNGraph::MWNNGraph(GraphProto& onnx_graph_proto, MWNNModel& model) {
     else {
       ip_name = mwnn_input.get_name();
       auto ip_node = mwnn_input.get_node();
-      mwnn_graph_nodes[ip_name] = std::move(*ip_node);
+      mwnn_graph_nodes[ip_name] = std::move(ip_node);
     }
   }
   for (auto op_value_info_proto : graph_proto.output()) {

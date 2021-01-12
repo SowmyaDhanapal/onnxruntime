@@ -107,7 +107,7 @@ class MWNNGraph {
     std::vector<MWNNValueInfo> get_graph_inputs() { return mwnn_inputs; }
     std::vector<MWNNValueInfo> get_graph_outputs() { return mwnn_outputs; }
     std::set<std::string> mwnn_initializer_names;
-    std::map<std::string, op::Node> mwnn_graph_nodes;
+    std::map<std::string, std::shared_ptr<op::Node>> mwnn_graph_nodes;
   private:
     GraphProto graph_proto;
     MWNNModel mwnn_model;
