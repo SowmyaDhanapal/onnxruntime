@@ -15,8 +15,7 @@ class MWNNValueInfo {
     int get_type() { return onnx_type; }
     std::vector<int64_t> get_dims() { return dims; }
     std::shared_ptr<op::Node> get_node() {
-      auto ip_data = std::make_shared<op::InputData>(name, dims, t_type);
-      return std::static_pointer_cast<op::Node>(ip_data);
+      return std::make_shared<op::InputData>(name, dims, t_type);
     }
     void update_dims(std::vector<int64_t> n_dims) {
       dims = n_dims;
