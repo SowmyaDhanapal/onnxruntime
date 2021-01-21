@@ -4,17 +4,16 @@
 #include <memory>
 #include <iostream>
 
-#include "function.h"
-#include "metawarenn_graph.h"
-#include "optimizer/pass_manager.h"
-#include "optimizer/metawarenn_optimizer.h"
-#include "optimizer/remove_reshape.h"
-#include "metawarenn_utils.h"
+#include "metawarenn_lib/metawarenn_graph.h"
+#include "metawarenn_lib/optimizer/pass_manager.h"
+#include "metawarenn_lib/optimizer/metawarenn_optimizer.h"
+#include "metawarenn_lib/optimizer/remove_reshape.h"
+#include "metawarenn_lib/metawarenn_utils.h"
 
 #define CHW_TO_HWC 1
 namespace metawarenn {
 
-  std::shared_ptr<Function> import_onnx_model(std::istream& stream);
+  void import_onnx_model(std::istream& stream);
 
 } //namespace metawarenn
 
@@ -22,7 +21,7 @@ namespace InferenceEngine {
 
   class CNNNetwork {
   public:
-    CNNNetwork(/*const std::shared_ptr<graph::Function>& network*/);
+    CNNNetwork();
   };
 
 //Update for MetaWare specific types

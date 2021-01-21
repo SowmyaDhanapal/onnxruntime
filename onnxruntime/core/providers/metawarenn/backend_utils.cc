@@ -11,10 +11,9 @@ CreateCNNNetwork(const ONNX_NAMESPACE::ModelProto& model_proto) {
   std::cout << "\n In CreateCNNNetwork!!";
 
   std::istringstream model_stream{model_proto.SerializeAsString()};
-  std::shared_ptr<metawarenn::Function> graph_func;
 
   try {
-    graph_func = metawarenn::import_onnx_model(model_stream);
+    metawarenn::import_onnx_model(model_stream);
     //LOGS_DEFAULT(INFO) << "ONNX Import Done";
   } catch (const std::exception& exp) {
     //ORT_THROW(log_tag + "[MetaWareNN-EP] Exception while importing model to nGraph Func: " + std::string(exp.what()));
@@ -22,7 +21,7 @@ CreateCNNNetwork(const ONNX_NAMESPACE::ModelProto& model_proto) {
     //ORT_THROW(log_tag + "[MetaWareNN-EP] Unknown exception while importing model to nGraph Func");
   }
 
-  return std::make_shared<InferenceEngine::CNNNetwork>(/*graph_func*/);
+  return std::make_shared<InferenceEngine::CNNNetwork>();
 
 }
 

@@ -89,14 +89,14 @@ class MWNNGraph {
       });
       return it->set_outputs(op_name, index);
     }
-    void update_initializer_tensors(std::string tensor_name, std::vector<int64_t> n_dims, std::vector<float> n_tensor) {
+    void update_initializer_tensors(std::string tensor_name, std::vector<int> n_dims, std::vector<float> n_tensor) {
       auto it = std::find_if(
       std::begin(mwnn_initializer_tensors), std::end(mwnn_initializer_tensors), [&](MWNNTensor& tensor) {
           return tensor.get_name() == tensor_name;
       });
       return it->update_tensor(n_dims, n_tensor);
     }
-    void update_inputs(std::string value_info_name, std::vector<int64_t> n_dims) {
+    void update_inputs(std::string value_info_name, std::vector<int> n_dims) {
       auto it = std::find_if(
       std::begin(mwnn_inputs), std::end(mwnn_inputs), [&](MWNNValueInfo& valueinfo) {
           return valueinfo.get_name() == value_info_name;

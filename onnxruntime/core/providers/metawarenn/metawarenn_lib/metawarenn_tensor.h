@@ -20,12 +20,12 @@ class MWNNTensor {
     void set_tensor();
     std::string get_name() { return name; }
     int get_type() { return onnx_type; }
-    std::vector<int64_t> get_dims() { return dims; }
+    std::vector<int> get_dims() { return dims; }
     std::vector<float> get_tensor() { return tensor; }
     std::shared_ptr<op::Node> get_constant_node() {
       return std::make_shared<op::Constant>(name, dims, tensor, t_type);
     }
-    void update_tensor(std::vector<int64_t> n_dims, std::vector<float> n_tensor) {
+    void update_tensor(std::vector<int> n_dims, std::vector<float> n_tensor) {
       dims = n_dims;
       tensor = n_tensor;
     }
@@ -34,7 +34,7 @@ class MWNNTensor {
     std::string name;
     int onnx_type;
     ElementType::element_type t_type;
-    std::vector<int64_t> dims;
+    std::vector<int> dims;
     std::vector<float> tensor;
 };
 

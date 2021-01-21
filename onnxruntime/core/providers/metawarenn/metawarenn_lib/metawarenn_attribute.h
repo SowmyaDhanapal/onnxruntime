@@ -13,13 +13,13 @@ class MWNNAttribute {
     void set_data(int m_data);
     std::string get_name() { return name; }
     int get_type() { return type; }
-    std::vector<float> get_data() { return data; }
+    std::vector<int> get_data() { return data; }
     std::vector<std::string> get_string_data() { return string_data; }
   private:
     AttributeProto attribute_proto;
     std::string name;
     int type;
-    std::vector<float> data;
+    std::vector<int> data;
     std::vector<std::string> string_data;
     //TODO : Handle the Tensor and Graph Datatypes
   public:
@@ -41,11 +41,11 @@ class MWNNAttribute {
     float get_float() { return attribute_proto.f(); }
     int64_t get_int() { return attribute_proto.i(); }
     const std::string& get_string() { return attribute_proto.s(); }
-    std::vector<float> get_float_array() {
+    std::vector<int> get_float_array() {
       return {std::begin(attribute_proto.floats()),
               std::end(attribute_proto.floats())};
     }
-    std::vector<float> get_integer_array() {
+    std::vector<int> get_integer_array() {
       return {std::begin(attribute_proto.ints()),
               std::end(attribute_proto.ints())};
     }

@@ -13,11 +13,11 @@ class MWNNValueInfo {
     MWNNValueInfo(ValueInfoProto& onnx_value_info_proto);
     std::string get_name() { return name; }
     int get_type() { return onnx_type; }
-    std::vector<int64_t> get_dims() { return dims; }
+    std::vector<int> get_dims() { return dims; }
     std::shared_ptr<op::Node> get_node() {
       return std::make_shared<op::InputData>(name, dims, t_type);
     }
-    void update_dims(std::vector<int64_t> n_dims) {
+    void update_dims(std::vector<int> n_dims) {
       dims = n_dims;
     }
   private:
@@ -25,7 +25,7 @@ class MWNNValueInfo {
     std::string name;
     int onnx_type;
     ElementType::element_type t_type;
-    std::vector<int64_t> dims;
+    std::vector<int> dims;
 };
 
 } //namespace metawarenn

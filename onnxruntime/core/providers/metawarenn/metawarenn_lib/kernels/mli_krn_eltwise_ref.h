@@ -182,7 +182,6 @@ static MLI_FORCE_INLINE void eltwise_prepare_and_run(
         const mli_tensor *in1,
         const mli_tensor *in2,
         mli_tensor *out) {
-
     MLI_PRINTF_FUNC();
 
     mli_prv_fx_init_dsp_ctrl();

@@ -182,13 +182,13 @@ static MLI_FORCE_INLINE generic_tensor_private_t<T> mli_prv_get_non_axis_tensor(
         non_axis_prv_tensor.shape[i] = 1;
         non_axis_prv_tensor.rank = 0;
     }
-    
+
     if (axis > -1) {
         /* Convert input tensor to a tensor that has the Non Axis parameters only in case of axis. */
         non_axis_prv_tensor.rank = in->rank - 1;
         for (int all_dim_idx = 0, not_axis_dim_idx = 0; all_dim_idx < MLI_MAX_RANK; all_dim_idx++) {
             if (all_dim_idx != axis) {
-                non_axis_prv_tensor.shape[not_axis_dim_idx] = (all_dim_idx < (int)in->rank) ? 
+                non_axis_prv_tensor.shape[not_axis_dim_idx] = (all_dim_idx < (int)in->rank) ?
                                                                in->shape[all_dim_idx] : 1;
                 non_axis_prv_tensor.mem_stride[not_axis_dim_idx] = in->mem_stride[all_dim_idx];
                 not_axis_dim_idx++;
@@ -205,7 +205,7 @@ static MLI_FORCE_INLINE generic_tensor_private_t<T> mli_prv_get_non_axis_tensor(
 template <typename T>
 static MLI_FORCE_INLINE void mli_prv_reorder_generic_tensor(
         generic_tensor_private_t<T> *in_prv) {
-    
+
     int i = MLI_MAX_RANK - 1;
     for (int j = in_prv->rank - 1 ; j >= 0; i--, j--) {
         in_prv->shape[i]  = in_prv->shape[j];
@@ -388,7 +388,7 @@ extern "C" {
 #endif
 
 static MLI_FORCE_INLINE mli_status mli_prv_copy_tensor_format(
-        const mli_tensor * src, 
+        const mli_tensor * src,
         mli_tensor * dst) {
     mli_status check = MLI_CHECK_STATUS(mli_chk_tensor (src), __func__);
     if (check != MLI_STATUS_OK)
@@ -517,8 +517,8 @@ mli_prv_get_relu_min_max (const mli_relu_cfg * cfg, const mli_tensor * out) {
     if (out->el_type == MLI_EL_SA_8 || out->el_type == MLI_EL_SA_32) {
         MLI_ASSERT(out->el_params.sa.dim < 0);
         zero = out->el_params.sa.zero_point.mem.i16;
-        // In theory it is possible that scale of input is really small value and shift might be bigger than 16 bit to 
-        // represent six and one in such format before int div (may exceed 32 bits). 
+        // In theory it is possible that scale of input is really small value and shift might be bigger than 16 bit to
+        // represent six and one in such format before int div (may exceed 32 bits).
         // One and six are not casted to 16bit directly, only after comparison with min_val and max_val and all of them are int.
         // Min val and max val always fit to container range, while six and one don't have to.
         // TODO: think about how to define whether it is required to extract six and one at all or not.

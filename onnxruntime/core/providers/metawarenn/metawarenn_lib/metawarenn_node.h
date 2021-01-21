@@ -24,7 +24,7 @@ class MWNNNode {
     void set_outputs(std::string name, int index) { outputs[index] = name; }
     std::vector<MWNNAttribute> get_attributes() { return mwnn_attributes; }
 
-    std::vector<float> get_attribute_value(std::string name) {
+    std::vector<int> get_attribute_value(std::string name) {
       auto it = std::find_if(
       std::begin(mwnn_attributes), std::end(mwnn_attributes), [&](MWNNAttribute& attribute) {
           return attribute.get_name() == name;
@@ -59,17 +59,13 @@ class MWNNNode {
         return std::make_shared<op::Conv>(name, inputs, outputs,
                                           get_attribute_value("dilations"),
                                           get_attribute_value("strides"),
-                                          get_attribute_value("kernel_shape"),
-                                          get_attribute_value("pads"),
-                                          get_attribute_string("auto_pad"));
+                                          get_attribute_value("pads"));
       }
       else if(op_type == "DepthwiseConv") {
         return std::make_shared<op::DepthwiseConv>(name, inputs, outputs,
-                                          get_attribute_value("dilations"),
-                                          get_attribute_value("strides"),
-                                          get_attribute_value("kernel_shape"),
-                                          get_attribute_value("pads"),
-                                          get_attribute_string("auto_pad"));
+                                                   get_attribute_value("dilations"),
+                                                   get_attribute_value("strides"),
+                                                   get_attribute_value("pads"));
       }
       else if(op_type == "Relu") {
         return std::make_shared<op::Relu>(name, inputs, outputs);

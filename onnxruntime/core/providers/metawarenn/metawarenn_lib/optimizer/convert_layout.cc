@@ -26,8 +26,8 @@ ConvertLayout::ConvertLayout(MWNNGraph* mwnn_graph, MWNNValueInfo mwnn_value_inf
 void ConvertLayout::RunPass() {
   if(is_tensor) {
     if(CHW_to_HWC) {
-      std::vector<int64_t> dims = tensor.get_dims();
-      std::vector<int64_t> new_dims{dims[0], dims[2], dims[3], dims[1]};
+      std::vector<int> dims = tensor.get_dims();
+      std::vector<int> new_dims{dims[0], dims[2], dims[3], dims[1]};
       std::vector<float> data = tensor.get_tensor();
       std::vector<float> new_data((dims[0]*dims[1]*dims[2]*dims[3]), 0);
       int channel = dims[1];
@@ -51,8 +51,8 @@ void ConvertLayout::RunPass() {
 
     }
     else if(HWC_to_CHW) {
-      std::vector<int64_t> dims = tensor.get_dims();
-      std::vector<int64_t> new_dims{dims[0], dims[3], dims[1], dims[2]};
+      std::vector<int> dims = tensor.get_dims();
+      std::vector<int> new_dims{dims[0], dims[3], dims[1], dims[2]};
       std::vector<float> data = tensor.get_tensor();
       std::vector<float> new_data((dims[0]*dims[1]*dims[2]*dims[3]), 0);
       int channel = dims[3];
@@ -78,8 +78,8 @@ void ConvertLayout::RunPass() {
   }
   else if(is_value_info) {
     if(CHW_to_HWC) {
-      std::vector<int64_t> dims = value_info.get_dims();
-      std::vector<int64_t> new_dims{dims[0], dims[2], dims[3], dims[1]};
+      std::vector<int> dims = value_info.get_dims();
+      std::vector<int> new_dims{dims[0], dims[2], dims[3], dims[1]};
       graph->update_inputs(value_info.get_name(), new_dims);
 
       auto& node = graph->mwnn_graph_nodes[value_info.get_name()];
@@ -87,8 +87,8 @@ void ConvertLayout::RunPass() {
         input_data_node->shape = new_dims;
     }
     else if(HWC_to_CHW) {
-      std::vector<int64_t> dims = value_info.get_dims();
-      std::vector<int64_t> new_dims{dims[0], dims[3], dims[1], dims[2]};
+      std::vector<int> dims = value_info.get_dims();
+      std::vector<int> new_dims{dims[0], dims[3], dims[1], dims[2]};
       graph->update_inputs(value_info.get_name(), new_dims);
 
       auto& node = graph->mwnn_graph_nodes[value_info.get_name()];

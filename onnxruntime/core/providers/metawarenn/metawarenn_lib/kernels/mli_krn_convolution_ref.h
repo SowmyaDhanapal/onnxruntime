@@ -42,7 +42,7 @@ MLI_FORCE_INLINE void convolution2D(
         const int dilation_height, const int dilation_width,
         const int padding_top, const int padding_left,
         const int padding_bot, const int padding_right) {
-    // Unified Generic convolution for all layouts (CHW/HWC/HWCN) and quantization scheme:  
+    // Unified Generic convolution for all layouts (CHW/HWC/HWCN) and quantization scheme:
     // MLI_FX (symmetric data, scales are power of two) and s8asym (assymetric data, scales of any value)
     // For each output point Calculation implies dotproduct and bias add:
     //            out_val = sum_i(x_r * w_r) + b_r
@@ -54,7 +54,7 @@ MLI_FORCE_INLINE void convolution2D(
     //      out_val = sum(x*w) - sum_i(w*x_zp) - sum_i(x*w_zp) + sum_i(w_zp*x_zp) + b_r
     // where:
     //      sum(x*w)       - generic dotproduct which can't be avoided for any type
-    //      -sum_i(w*x_zp) - weights_additive. 
+    //      -sum_i(w*x_zp) - weights_additive.
     //                       Allways Zero for FX and can be reused in output channel calculations for s8asym
     //      -sum_i(x*w_zp) - in_additive
     //                       Allways Zero for both FX and TF_s8asym assuming symmetric weights (w_zp == 0)
@@ -63,7 +63,7 @@ MLI_FORCE_INLINE void convolution2D(
     //      b_r             - bias_additive
     //                        (must be of the same type as accumulator, that may require bias re-quantization)
     //
-    // IMPORTANT NOTE: For border areas with padding, weights/input/zp can be reused only in case of explicitly padded values. 
+    // IMPORTANT NOTE: For border areas with padding, weights/input/zp can be reused only in case of explicitly padded values.
     //                 In other case, these additives must be calculatid for valid area of dotproduct only.
     //================================================================================================
     const int row_begin = perception_area.row_beg;
@@ -126,7 +126,7 @@ MLI_FORCE_INLINE void convolution2D(
                 *out_ptr = out_val;
             } // for out_ch_idx
         } // for W_idx
-    } // for H_idx 
+    } // for H_idx
     std::cout << "\n\nConvolution kernel executed successfully!\n";
 }
 
@@ -147,15 +147,14 @@ MLI_FORCE_INLINE void depthwise_convolution2D(
         const int dilation_height, const int dilation_width,
         const int padding_top, const int padding_left,
         const int padding_bot, const int padding_right) {
-    // Unified Depthwise convolutions for all layouts (NCHW/HWCN) and quantization schemes:  
+    // Unified Depthwise convolutions for all layouts (NCHW/HWCN) and quantization schemes:
     // MLI_FX (symmetric data, scales are power of two) and s8asym (assymetric data, scales of any value)
-    // For more info on calculations see generic convolution 2D notes above 
+    // For more info on calculations see generic convolution 2D notes above
     //================================================================================================
     const int row_begin = perception_area.row_beg;
     const int row_end = perception_area.row_end;
     const int clmn_begin = perception_area.clmn_beg;
     const int clmn_end = perception_area.clmn_end;
-
     for (int H_idx = row_begin; H_idx < row_end; H_idx++) {
         for (int W_idx = clmn_begin; W_idx < clmn_end; W_idx++) {
             // Define area of input and filter for convolution

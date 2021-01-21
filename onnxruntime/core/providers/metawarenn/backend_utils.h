@@ -1,4 +1,4 @@
-#include "metawarenn_lib/metawarenn.h"
+#include "metawarenn.h"
 
 namespace onnxruntime {
 namespace metawarenn_ep {

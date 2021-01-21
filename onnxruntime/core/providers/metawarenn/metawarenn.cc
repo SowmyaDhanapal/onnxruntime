@@ -2,7 +2,7 @@
 
 namespace metawarenn {
 
-std::shared_ptr<Function> import_onnx_model(std::istream& stream) {
+void import_onnx_model(std::istream& stream) {
   std::cout << "\n import_onnx_model";
   ModelProto model_proto;
   if (!model_proto.ParseFromIstream(&stream))
@@ -176,7 +176,6 @@ std::shared_ptr<Function> import_onnx_model(std::istream& stream) {
       std::cout << t_val << ",";
     std::cout << "]";*/
   }
-  return nullptr;
 }
 
 } //namespace metawarenn
