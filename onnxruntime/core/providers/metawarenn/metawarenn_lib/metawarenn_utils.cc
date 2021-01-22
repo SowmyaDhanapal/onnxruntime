@@ -17,12 +17,14 @@ void fill_mwnn_tensor_initalizer(std::string input_name, MWNNGraph mwnn_graph, m
   mwnn_initalizer->el_params.fx.frac_bits = mwnn_initalizer->el_type - (int)ceil(log2(max)) - 1;
   int wt_buf_size = 1;
   uint8_t i;
+
   if (dims.size() > 1)
   {
     *ch = dims[0];
     *k_height = is_HWC ? dims[1] : dims[2];
     *k_width = is_HWC ? dims[2] : dims[3];
   }
+
   std::cout << "\nDimension size: ";
   for (i = 0; i < dims.size(); i++)
   {
@@ -80,28 +82,10 @@ void create_mwnn_tensor_output(mli_tensor *mwnn_tensor, long int buf_size)
   std::cout << "\nOutput's data capacity: " << mwnn_tensor->data.capacity;
 }
 
-int arg_max(mli_tensor * net_output, int size) {
-    int arg_max = 0;
-
-    int16_t *out_16 = (int16_t *)(net_output->data.mem.void_p);
-    int16_t max_16 = out_16[0];
-    std::cout << "\nsize: " << size;
-
-    for (int idx = 0; idx < size; ++idx)
-    {
-        if (max_16 < out_16[idx])
-        {
-            arg_max = idx;
-            max_16 = out_16[idx];
-        }
-    }
-    return arg_max;
-}
-
 void convert_to_mwnn_format(MWNNGraph mwnn_graph, int is_HWC)
 {
-    std::map<std::string, mli_tensor> tensor_map;
-    std::cout << "\n======================================================================================================================= \n";
+  std::map<std::string, mli_tensor> tensor_map;
+  std::cout << "\n======================================================================================================================= \n";
   std::cout << "\n --------------------------------- Conversion to MetaWareNN High Level Graph Format -----------------------------------\n";
   auto node_list = mwnn_graph.get_graph_nodes();
   for (int node_idx = 0; node_idx < mwnn_graph.get_graph_nodes().size() ; node_idx++) {
@@ -125,18 +109,22 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph, int is_HWC)
       conv_cfg.padding_right = pads[3];
       conv_cfg.dilation_height = dilations[0];
       conv_cfg.dilation_width = dilations[1];
+      auto activation = g_n.get_attribute_value("activation")[0];
+      if(activation == ActivationType::Activation_None)
+        conv_cfg.relu.type = MLI_RELU_NONE;
+      else if(activation == ActivationType::Activation_Relu)
+        conv_cfg.relu.type = MLI_RELU_GEN;
+      else if(activation == ActivationType::Activation_Relu6)
+        conv_cfg.relu.type = MLI_RELU_6;
       std::cout << "\n\nConfig params:";
       std::cout << "\nstride_height : " << (int)conv_cfg.stride_height;
       std::cout << "\nstride_width : " << (int)conv_cfg.stride_width;
-      std::cout << "\npadding_bottom : " << (int)conv_cfg.padding_bottom;
       std::cout << "\npadding_top : " << (int)conv_cfg.padding_top;
+      std::cout << "\npadding_left : " << (int)conv_cfg.padding_left;
+      std::cout << "\npadding_bottom : " << (int)conv_cfg.padding_bottom;
+      std::cout << "\npadding_right : " << (int)conv_cfg.padding_right;
       std::cout << "\ndilation_height : " << (int)conv_cfg.dilation_height;
       std::cout << "\ndilation_width : " << (int)conv_cfg.dilation_width;
-      // Get the next relu node to fuse with conv+BN and update the output_name to fetch as i/p for next conv node
-      output_name = g_n.get_outputs()[0];
-      conv_cfg.relu.type = MLI_RELU_NONE;
-      if(g_n.get_attribute_value("activation")[0])
-        conv_cfg.relu.type = MLI_RELU_GEN;
       mli_tensor input_tensor;
       mli_tensor conv_wt;
       mli_tensor conv_bias;
@@ -196,9 +184,10 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph, int is_HWC)
             &conv_bias,
             &conv_cfg, &output_tensor);
       }
+
       output_tensor.shape[3] = 1;
-      std::cout << "\nOutput key in tensor map: " << output_name;
-      tensor_map.insert(std::pair<std::string, mli_tensor>(output_name, output_tensor)); // Store the output tensor to tensor map
+      std::cout << "\nOutput key in tensor map: " << g_n.get_outputs()[0];
+      tensor_map.insert(std::pair<std::string, mli_tensor>(g_n.get_outputs()[0], output_tensor)); // Store the output tensor to tensor map
     }
     else if (op_type =="Add")
     {
@@ -214,7 +203,7 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph, int is_HWC)
         buf_size = buf_size * shape[i];
       }
 
-      // To change data layout from CHW to NCHW 
+      // To change data layout from CHW to NCHW
       int temp = (tensor_map.find(input[0]))->second.shape[rank - 1];
       for(int i = (tensor_map.find(input[0]))->second.rank - 1; i > 0; i--)
       {
@@ -242,7 +231,7 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph, int is_HWC)
       mli_tensor input_tensor = (tensor_map.find(input[0]))->second;
       int16_t *input_buf, *new_input_buf;
       int channel, width, height;
-      if(!(is_HWC))//CHW
+      if(!(is_HWC)) //CHW
       {
         // Data layout conversion from CHW to HWC
         input_buf = (int16_t *)(tensor_map.find(input[0]))->second.data.mem.void_p;//chw
@@ -277,7 +266,7 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph, int is_HWC)
 
       mli::krn::mli_krn_avepool_hwc<int16_t, mli_fx16_accu_t, 0>(&(tensor_map.find(input[0]))->second, &pool_cfg, &output_tensor);
 
-      if(!is_HWC)//CHW
+      if(!is_HWC) //CHW
       {
       // Data layout conversion from HWC to CHW
         channel = output_tensor.shape[FMAP_C_DIM_HWC];
@@ -298,19 +287,19 @@ void convert_to_mwnn_format(MWNNGraph mwnn_graph, int is_HWC)
         output_tensor.shape[FMAP_W_DIM_CHW] = width;
         output_tensor.shape[FMAP_C_DIM_CHW] = channel;
       }
-      output_tensor.shape[3] = 1;
       tensor_map.insert(std::pair<std::string, mli_tensor>(g_n.get_outputs()[0], output_tensor));
     }
     else if (op_type =="Reshape")
     {
       auto input = g_n.get_inputs();
-      tensor_map.insert(std::pair<std::string, mli_tensor>(g_n.get_name(), (tensor_map.find(input[0]))->second));
+      tensor_map.insert(std::pair<std::string, mli_tensor>(g_n.get_outputs()[0], (tensor_map.find(input[0]))->second));
+    }
+    else if (op_type =="Softmax")
+    {
+      auto input = g_n.get_inputs();
+      tensor_map.insert(std::pair<std::string, mli_tensor>(g_n.get_outputs()[0], (tensor_map.find(input[0]))->second));
     }
   }
-  std::cout << mwnn_graph.get_graph_op_name();
-  mli_tensor output = (tensor_map.find(mwnn_graph.get_graph_op_name()))->second;
-  int predicted_label = arg_max(&output, output.shape[0]);
-  std::cout << "\npredicted label: " << predicted_label;
 }
 
 } //namespace metawarenn

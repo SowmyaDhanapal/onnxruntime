@@ -2,16 +2,19 @@
 
 namespace metawarenn {
 
+//ONNXConstructor
 MWNNAttribute::MWNNAttribute(AttributeProto& onnx_attribute_proto) {
   attribute_proto = onnx_attribute_proto;
   name = attribute_proto.name();
   type = attribute_proto.type();
   set_data();
 }
-MWNNAttribute::MWNNAttribute(std::string m_name, int m_data) {
+
+//TFConstructor
+MWNNAttribute::MWNNAttribute(std::string m_name, std::vector<int> m_data) {
   name = m_name;
   type = AttributeProto_AttributeType_INT;
-  data.push_back(m_data);
+  data = m_data;
 }
 
 void MWNNAttribute::set_data() {

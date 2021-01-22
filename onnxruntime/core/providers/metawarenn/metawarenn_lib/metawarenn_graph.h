@@ -2,10 +2,12 @@
 #define METAWARENN_GRAPH_H_
 
 #include "metawarenn_model.h"
-#include "metawarenn_node.h"
-#include "metawarenn_value_info.h"
 #include "metawarenn_tensor.h"
+#include "metawarenn_node.h"
+#include "metawarenn_element.h"
+#include "metawarenn_value_info.h"
 #include "op/node.h"
+#include "tensorflow/lite/schema/schema_generated.h"
 
 namespace metawarenn {
 
@@ -13,6 +15,7 @@ class MWNNGraph {
   public:
     MWNNGraph() = default;
     MWNNGraph(GraphProto& onnx_graph_proto, MWNNModel& model);
+    MWNNGraph(TfLiteContext* context, std::vector<int> subgraph_nodes_);
     std::string get_name() { return name; }
     std::string get_graph_ip_name() { return ip_name; }
     std::string get_graph_op_name() { return op_name; }
@@ -106,6 +109,7 @@ class MWNNGraph {
     std::vector<MWNNNode> get_graph_nodes() { return mwnn_nodes; }
     std::vector<MWNNValueInfo> get_graph_inputs() { return mwnn_inputs; }
     std::vector<MWNNValueInfo> get_graph_outputs() { return mwnn_outputs; }
+
     std::set<std::string> mwnn_initializer_names;
     std::map<std::string, std::shared_ptr<op::Node>> mwnn_graph_nodes;
   private:
@@ -121,5 +125,4 @@ class MWNNGraph {
 };
 
 } //namespace metawarenn
-
 #endif //METAWARENN_GRAPH_H_

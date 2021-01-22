@@ -3,12 +3,13 @@
 
 #include "metawarenn_model.h"
 #include "metawarenn_attribute.h"
-#include "op/conv.h"
-#include "op/depthwise_conv.h"
-#include "op/relu.h"
 #include "op/add.h"
-#include "op/avg_pool.h"
+#include "op/conv.h"
+#include "op/relu.h"
 #include "op/reshape.h"
+#include "op/softmax.h"
+#include "op/avg_pool.h"
+#include "op/depthwise_conv.h"
 
 namespace metawarenn {
 
@@ -16,6 +17,7 @@ class MWNNNode {
   public:
     MWNNNode() = default;
     MWNNNode(NodeProto& onnx_node_proto);
+    MWNNNode(std::string m_name, std::string m_op_type, std::vector<MWNNAttribute> m_mwnn_attributes, std::vector<std::string> m_inputs,  std::vector<std::string> m_outputs);
     std::string get_name() { return name; }
     std::string get_op_type() { return op_type; }
     std::vector<std::string> get_inputs() { return inputs; }
@@ -44,16 +46,6 @@ class MWNNNode {
       }
       return it->set_data(value);
     }
-    std::vector<std::string> get_attribute_string(std::string name) {
-      auto it = std::find_if(
-      std::begin(mwnn_attributes), std::end(mwnn_attributes), [&](MWNNAttribute& attribute) {
-          return attribute.get_name() == name;
-      });
-      if (it == std::end(mwnn_attributes)) {
-          std::cout << "\n ERROR : End of Attributes!!! - Couldn't find " << name;
-      }
-      return it->get_string_data();
-    }
     std::shared_ptr<op::Node> get_node() {
       if(op_type == "Conv") {
         return std::make_shared<op::Conv>(name, inputs, outputs,
@@ -78,7 +70,10 @@ class MWNNNode {
       }
       else if(op_type == "Reshape") {
         return std::make_shared<op::Reshape>(name, inputs, outputs);
-        }
+      }
+      else if(op_type == "Softmax") {
+        return std::make_shared<op::Softmax>(name, inputs, outputs);
+      }
       else
         return NULL;
     }

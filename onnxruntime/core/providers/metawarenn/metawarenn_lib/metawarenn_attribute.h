@@ -8,7 +8,7 @@ namespace metawarenn {
 class MWNNAttribute {
   public:
     MWNNAttribute(AttributeProto& onnx_attribute_proto);
-    MWNNAttribute(std::string m_name, int m_data);
+    MWNNAttribute(std::string m_name, std::vector<int> m_data);
     void set_data();
     void set_data(int m_data);
     std::string get_name() { return name; }

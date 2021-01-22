@@ -17,9 +17,10 @@ class MWNNTensor {
   public:
     MWNNTensor() = default;
     MWNNTensor(TensorProto& onnx_tensor_proto);
+    MWNNTensor(std::string m_name, std::vector<int> m_dims, int m_type, std::vector<float> m_tensor);
     void set_tensor();
     std::string get_name() { return name; }
-    int get_type() { return onnx_type; }
+    int get_type() { return in_type; }
     std::vector<int> get_dims() { return dims; }
     std::vector<float> get_tensor() { return tensor; }
     std::shared_ptr<op::Node> get_constant_node() {
@@ -32,7 +33,7 @@ class MWNNTensor {
   private:
     TensorProto tensor_proto;
     std::string name;
-    int onnx_type;
+    int in_type;
     ElementType::element_type t_type;
     std::vector<int> dims;
     std::vector<float> tensor;
