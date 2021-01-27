@@ -26,10 +26,10 @@ MWNNTensor::MWNNTensor(std::string m_name, std::vector<int> m_dims, int m_type, 
 
 void MWNNTensor::set_tensor() {
   switch (in_type) {
-    case ONNX_NAMESPACE::TensorProto_DataType_FLOAT:
+    case onnx::TensorProto_DataType_FLOAT:
       tensor = get_data<float>(tensor_proto.float_data());
       break;
-    case ONNX_NAMESPACE::TensorProto_DataType_INT64:
+    case onnx::TensorProto_DataType_INT64:
       tensor = get_data<float>(tensor_proto.int64_data());
       break;
     default:
