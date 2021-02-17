@@ -3,8 +3,7 @@
 namespace onnxruntime {
 namespace metawarenn_ep {
 
-std::shared_ptr<InferenceEngine::CNNNetwork>
-CreateCNNNetwork(const ONNX_NAMESPACE::ModelProto& model_proto);
+void CreateCNNNetwork(const ONNX_NAMESPACE::ModelProto& model_proto, metawarenn::MWNNGraph& mwnn_graph);
 
 void SetIODefs(/*const ONNX_NAMESPACE::ModelProto& model_proto,
                std::shared_ptr<InferenceEngine::CNNNetwork> network*/);

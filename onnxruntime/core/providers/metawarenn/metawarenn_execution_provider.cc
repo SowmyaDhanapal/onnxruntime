@@ -266,7 +266,8 @@ common::Status MetaWareNNExecutionProvider::Compile(const std::vector<onnxruntim
     compute_info.compute_func = [](FunctionState state, const OrtApi* api, OrtKernelContext* context) {
       auto function_state = static_cast<MetaWareNNFunctionState*>(state);
       try {
-        function_state->backend_manager->Compute(*api, context);
+        metawarenn::MWNNGraph mwnn_graph = function_state->backend_manager->mwnn_graph_;
+        function_state->backend_manager->Compute(*api, context, mwnn_graph);
       } catch (const char* msg) {
         return common::Status(common::ONNXRUNTIME, common::FAIL, msg);
       }

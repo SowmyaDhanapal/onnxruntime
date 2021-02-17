@@ -13,7 +13,7 @@
 #define CHW_TO_HWC 1
 namespace metawarenn {
 
-  void import_onnx_model(std::istream& stream);
+  void import_onnx_model(std::istream& stream, metawarenn::MWNNGraph& mwnn_graph);
 
 } //namespace metawarenn
 

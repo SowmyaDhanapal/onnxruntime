@@ -2,7 +2,7 @@
 
 namespace metawarenn {
 
-void import_onnx_model(std::istream& stream) {
+void import_onnx_model(std::istream& stream, metawarenn::MWNNGraph& mwnn_graph_) {
   std::cout << "\n import_onnx_model";
   ModelProto model_proto;
   if (!model_proto.ParseFromIstream(&stream))
@@ -54,10 +54,8 @@ void import_onnx_model(std::istream& stream) {
     }
   }
   manager.run_passes();
-  //To generate a High Level MetaWareNN Format
-  convert_to_mwnn_format(mwnn_graph, CHW_TO_HWC);
-  exit(1);
-
+  mwnn_graph_ = mwnn_graph;
+  /*
   std::cout << "\n ---------------------------Graph----------------------------- \n";
   std::cout << "\n Graph Name : " << mwnn_graph.get_name();
   std::cout << "\n Graph Input Name : " << mwnn_graph.get_graph_ip_name();
@@ -170,12 +168,12 @@ void import_onnx_model(std::istream& stream) {
     std::cout << "\n Dims : ";
     for (auto dim : g_t.get_dims())
       std::cout << dim << ",";
-    //Uncomment to Print the Tensor Values
+    //Uncomment to Print the Tensor Values*/
     /*std::cout << "\n Tensor : [";
     for (auto t_val : g_t.get_tensor())
       std::cout << t_val << ",";
-    std::cout << "]";*/
-  }
+    std::cout << "]";
+  }*/
 }
 
 } //namespace metawarenn

@@ -6,8 +6,8 @@ namespace metawarenn_ep {
 
 BackendManager::BackendManager(const onnxruntime::Node* fused_node, const logging::Logger& logger) {
   std::cout << "\n  --> In MetaWareNN BackendManager()  \n";
-  model_proto_ = GetModelProtoFromFusedNode(fused_node, logger);
-  metawarenn_backend_ = std::make_shared<BasicBackend>(model_proto_);
+  ONNX_NAMESPACE::ModelProto model_proto_ = GetModelProtoFromFusedNode(fused_node, logger);
+  metawarenn_backend_ = std::make_shared<BasicBackend>(model_proto_, mwnn_graph_);
 }
 
 ONNX_NAMESPACE::ModelProto
@@ -30,9 +30,10 @@ BackendManager::GetModelProtoFromFusedNode(const onnxruntime::Node* fused_node,
   return model_proto;
 }
 
-void BackendManager::Compute(Ort::CustomOpApi api, OrtKernelContext* context) {
+void BackendManager::Compute(Ort::CustomOpApi api, OrtKernelContext* context, metawarenn::MWNNGraph& mwnn_graph) {
   //Inference Part
-  metawarenn_backend_->Infer(api, context);
+  std::cout << "\ncalling convert_to_mwnn_format";
+  convert_to_mwnn_format(mwnn_graph, CHW_TO_HWC);
 }
 
 }  // namespace metawarenn_ep
